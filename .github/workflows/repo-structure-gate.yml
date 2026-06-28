@@ -1,0 +1,17 @@
+name: repo-structure-gate
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  repo-structure-gate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Check repository structure
+        run: python scripts/ci/check_repo_structure.py
