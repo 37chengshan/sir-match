@@ -1,0 +1,52 @@
+name: Change Request
+
+description: 用于提出文档、硬件、固件、算法或仓库结构变更需求
+
+title: "[Change]: "
+
+labels: ["change-request"]
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        请先说明问题和目标，再说明影响范围。不要直接丢文件或截图。
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: 问题背景
+      description: 现在遇到什么问题？为什么需要改？
+    validations:
+      required: true
+
+  - type: dropdown
+    id: scope
+    attributes:
+      label: 影响范围
+      options:
+        - common
+        - 比赛文档
+        - G-circuit-model
+        - control-car
+        - .github/scripts
+        - 新题目文件夹
+        - 其他
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: 期望方案
+      description: 希望如何修改？
+    validations:
+      required: true
+
+  - type: textarea
+    id: validation
+    attributes:
+      label: 验证方式
+      description: 如何判断修改完成？
+    validations:
+      required: true
