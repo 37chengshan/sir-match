@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>G题电路模型探究装置 · MSPM0G3507</title>
+  <style>
+    body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans SC",Arial,sans-serif;background:#07111f;color:#eef4ff;line-height:1.7}main{max-width:1040px;margin:auto;padding:40px 20px}.tag{color:#39d5ff;border:1px solid rgba(57,213,255,.35);border-radius:999px;padding:4px 12px;display:inline-block}h1{font-size:44px;margin:18px 0 8px}h2{color:#39d5ff;margin-top:34px}.muted{color:#9fb0ca}.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}.card{background:#101a2b;border:1px solid #26364f;border-radius:16px;padding:18px}pre{background:#040b14;border:1px solid #26364f;border-radius:16px;padding:18px;overflow:auto;color:#9eeeff}table{width:100%;border-collapse:collapse;background:#101a2b;border:1px solid #26364f}th,td{border-bottom:1px solid #26364f;padding:10px;text-align:left}th{color:#cdeeff}td{color:#9fb0ca}@media(max-width:800px){.grid{grid-template-columns:1fr}h1{font-size:32px}}
+  </style>
+</head>
+<body>
+<main>
+  <span class="tag">TI Cup · G题 · MSPM0G3507</span>
+  <h1>电路模型探究装置</h1>
+  <p class="muted">本题主控平台统一切换为 MSPM0G3507，围绕 AD9833 信号源、双 ADC 同步采样、Goertzel 幅相测量、DAC 波形复现构建。</p>
+
+  <section>
+    <h2>系统主线</h2>
+    <pre>AD9833 产生测试信号
+    ↓
+已知/未知模型电路
+    ↓
+MSPM0G3507 双 ADC 同步采 Vin / Vout
+    ↓
+Goertzel 提取幅值和相位
+    ↓
+建立 H(jω) 频率响应模型
+    ↓
+DAC 查表输出复现波形</pre>
+  </section>
+
+  <section>
+    <h2>核心模块</h2>
+    <div class="grid">
+      <div class="card"><strong>MSPM0G3507</strong><br><span class="muted">主控、ADC、DAC、DMA、状态机</span></div>
+      <div class="card"><strong>AD9833</strong><br><span class="muted">1kHz~50kHz 正弦扫频信号源</span></div>
+      <div class="card"><strong>Goertzel</strong><br><span class="muted">单频幅值和相位提取</span></div>
+      <div class="card"><strong>数字电位器</strong><br><span class="muted">自动幅度控制，稳定 2Vpp</span></div>
+      <div class="card"><strong>ADC 前端</strong><br><span class="muted">1.65V 偏置、限幅、缓冲、抗混叠</span></div>
+      <div class="card"><strong>DAC 输出</strong><br><span class="muted">查表波形复现，RC 重构滤波</span></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>当前实施顺序</h2>
+    <table>
+      <tr><th>阶段</th><th>目标</th><th>产出</th></tr>
+      <tr><td>1</td><td>基础外设</td><td>点灯、串口、OLED、AD9833</td></tr>
+      <tr><td>2</td><td>基本闭环</td><td>2Vpp 自动幅度控制</td></tr>
+      <tr><td>3</td><td>扫频建模</td><td>Vin/Vout 幅相、Bode CSV</td></tr>
+      <tr><td>4</td><td>波形复现</td><td>DAC 正弦/矩形波复现</td></tr>
+    </table>
+  </section>
+</main>
+</body>
+</html>
