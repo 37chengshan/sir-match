@@ -1,73 +1,97 @@
 # sir-match
 
-电赛备赛结构化仓库。当前主线是 **TI杯 / 全国大学生电子设计竞赛 G题：电路模型探究装置**，训练平台统一切换为 **TI MSPM0G3507**。
+电赛备赛结构化仓库。当前主线题目是 **G题：电路模型探究装置**，训练平台统一为 **TI MSPM0G3507**。
 
-## 仓库目标
+## 仓库结构原则
 
-本仓库不是只存一个临时方案，而是作为电赛备赛的长期资料库：
+本仓库只保留四类顶层入口：
 
-- 每个题目一个独立目录；
-- 通用要求、通用算法、通用硬件模块集中管理；
-- 方案、采购清单、仿真、固件、测试数据和报告资料分层存放；
-- 方便人和 agent 快速定位文件，避免根目录堆满零散文档。
+1. 根目录说明文件：`README.md`、`CLAUDE.md`、`AGENTS.md`；
+2. `common/`：通用算法、通用硬件模块、通用测试方法；
+3. `比赛文档/`：总要求、训练计划、采购原则、官方资料摘要；
+4. 每个题目一个顶层文件夹，例如 `G-circuit-model/`。
 
-## 推荐目录结构
+以后不要再使用二级 `problems/题目名/` 结构，新题目直接在仓库顶层新建文件夹。
+
+## 当前推荐结构
 
 ```text
 sir-match/
 ├── README.md
 ├── CLAUDE.md
-├── agent/
-│   └── CLAUDE.md
-├── docs/
-│   ├── 00-overall-requirements.md
-│   └── 01-training-plan.md
+├── AGENTS.md
 ├── common/
 │   ├── README.md
 │   ├── algorithms/
 │   │   └── README.md
 │   └── hardware/
 │       └── README.md
-├── problems/
+├── 比赛文档/
 │   ├── README.md
-│   ├── _template/
-│   │   └── README.md
-│   └── G-circuit-model/
-│       ├── README.md
-│       ├── docs/
-│       │   └── solution-MSPM0G3507.md
-│       ├── web/
-│       │   └── index.html
-│       ├── firmware/
-│       │   └── mspm0/
-│       ├── simulation/
-│       │   └── matlab/
-│       ├── hardware/
-│       ├── test-data/
-│       └── report/
-├── matlab/        # 旧位置：后续逐步迁入对应题目或 common
-└── stm32/         # 旧 STM32 方案代码，仅保留作历史参考
+│   ├── 00-总要求.md
+│   └── 01-MSPM0G3507训练计划.md
+└── G-circuit-model/
+    ├── README.md
+    ├── docs/
+    │   └── solution-MSPM0G3507.md
+    ├── firmware/
+    │   └── mspm0/
+    ├── simulation/
+    │   └── matlab/
+    ├── hardware/
+    ├── test-data/
+    ├── report/
+    └── web/
+        └── index.html
 ```
 
 ## 当前主线题目
 
-| 题目 | 文件夹 | 主控平台 | 当前状态 |
+| 题目 | 顶层文件夹 | 主控平台 | 当前状态 |
 |---|---|---|---|
-| G题：电路模型探究装置 | `problems/G-circuit-model/` | MSPM0G3507 | 方案、采购、训练计划已结构化 |
+| G题：电路模型探究装置 | `G-circuit-model/` | MSPM0G3507 | 方案、采购、训练计划已结构化 |
 
 ## 当前先做什么
 
-1. 先看 `docs/01-training-plan.md`，按阶段推进。
+1. 看 `比赛文档/01-MSPM0G3507训练计划.md`。
 2. 买第一批必备器材：MSPM0G3507、AD9833、OLED、运放、阻容感、电源、面包板、USB转串口。
-3. 先跑通最小闭环：AD9833 输出 → 模型电路 → MSPM0G3507 双 ADC 采样 → Goertzel 算幅相 → OLED/串口显示。
-4. 不要一开始做复杂 UI、大 FFT、完整报告；先让系统可测、可调、可复现。
+3. 在 `G-circuit-model/firmware/mspm0/` 新建真正的 MSPM0G3507 工程。
+4. 先跑通最小闭环：AD9833 输出 → 模型电路 → MSPM0G3507 双 ADC 采样 → Goertzel 算幅相 → OLED/串口显示。
+
+## 顶层题目文件夹规则
+
+新题目直接建在根目录：
+
+```text
+A-topic-name/
+B-topic-name/
+G-circuit-model/
+control-car/
+power-converter/
+```
+
+每个题目内部结构统一：
+
+```text
+<topic>/
+├── README.md
+├── docs/          方案、评分拆解、采购清单
+├── firmware/      固件工程
+├── simulation/    MATLAB/Python 仿真
+├── hardware/      原理图、PCB、接线图
+├── test-data/     CSV、示波器截图、标定结果
+├── report/        报告素材
+└── web/           展示页
+```
 
 ## 文件放置规则
 
-- 新题目：放入 `problems/<题目编号-英文短名>/`。
-- 题目专用方案：放入 `problems/<题目>/docs/`。
-- 题目专用固件：放入 `problems/<题目>/firmware/`。
-- 题目专用仿真：放入 `problems/<题目>/simulation/`。
-- 通用算法：放入 `common/algorithms/`。
-- 通用硬件模块：放入 `common/hardware/`。
-- 备赛计划、总要求、采购原则：放入 `docs/`。
+- 通用算法：`common/algorithms/`
+- 通用硬件模块：`common/hardware/`
+- 总计划和总要求：`比赛文档/`
+- 题目专用内容：对应顶层题目文件夹
+- agent/Claude/Codex 说明：根目录 `CLAUDE.md` 和 `AGENTS.md`
+
+## 已清理内容
+
+旧的 `stm32/`、`matlab/`、`docs/`、`problems/`、`agent/` 和根目录旧方案文件不再作为新结构的一部分。后续所有新增内容按本 README 放置。
