@@ -49,7 +49,12 @@ function y = filter_signal(x, R, L, C, fs)
     f = (0:N-1) * fs / N;
     s = 2*pi*f * 1j;
     H = 1 ./ (1 + s*R*C + s.^2*L*C);
-    H(N/2+2:end) = conj(H(N/2:-1:2));  % 共轭对称
+    % 共轭对称 (保证实数输出)
+    if mod(N, 2) == 0
+        H(N/2+2:end) = conj(H(N/2:-1:2));
+    else
+        H((N+1)/2+1:end) = conj(H((N+1)/2:-1:2));
+    end
     Y = X .* H;
     y = real(ifft(Y));
 end

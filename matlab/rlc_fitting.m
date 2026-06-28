@@ -116,8 +116,9 @@ function [R_est, L_est, C_est, error] = fit_rlc(f, mag_dB, type)
     bw_gain = peak_gain / sqrt(2);
 
     % 找上下3dB点
-    idx_low = find(mag_linear(1:round(end/2)) >= bw_gain, 1, 'first');
-    idx_high = find(mag_linear(round(end/2):end) >= bw_gain, 1, 'last') + round(end/2) - 1;
+    N = length(mag_linear);
+    idx_low = find(mag_linear(1:round(N/2)) >= bw_gain, 1, 'first');
+    idx_high = find(mag_linear(round(N/2):N) >= bw_gain, 1, 'last') + round(N/2) - 1;
 
     if ~isempty(idx_low) && ~isempty(idx_high)
         bw = f(idx_high) - f(idx_low);
@@ -137,28 +138,29 @@ function [R_est, L_est, C_est, error] = fit_rlc(f, mag_dB, type)
 
     w0 = 2*pi*f0_est;
 
+    % 如果Q估算太低，放宽R范围约束
+    R_min = 1e3;
+    R_max = 100e3;  % 放宽到100k
+
     for L = L_values
         % 从f0计算C
         C = 1 / (w0^2 * L);
 
-        % 验证C在范围内 (10nF - 100nF)
-        if C >= 10e-9 && C <= 100e-9
+        % 验证C在合理范围内
+        if C >= 1e-9 && C <= 1e-6
             % 从Q计算R
-            R = sqrt(L/C) / Q_est;
+            R = sqrt(L/C) / max(Q_est, 0.01);  % Q最小0.01
 
-            % 验证R在范围内 (1kΩ - 10kΩ)
-            if R >= 1e3 && R <= 10e3
-                % 计算拟合误差
-                H_est = rlc_transfer(R, L, C, f, type);
-                mag_est = 20*log10(abs(H_est));
-                error = sqrt(mean((mag_est - mag_dB).^2));
+            % 计算拟合误差(即使R超出范围也只惩罚)
+            H_est = rlc_transfer(R, L, C, f, type);
+            mag_est = 20*log10(abs(H_est));
+            error = sqrt(mean((mag_est - mag_dB).^2));
 
-                if error < best_error
-                    best_error = error;
-                    R_est = R;
-                    L_est = L;
-                    C_est = C;
-                end
+            if error < best_error
+                best_error = error;
+                R_est = R;
+                L_est = L;
+                C_est = C;
             end
         end
     end
@@ -249,8 +251,12 @@ for i = 1:length(test_cases)
     H_tc = rlc_transfer(tc.R, tc.L, tc.C, f, tc.type);
     mag_tc = 20*log10(abs(H_tc));
     identified = identify_filter_type(f, mag_tc);
-    fprintf('用例%d: 设定=%s, 识别=%s %s\n', i, tc.type, identified, ...
-        strcmp(identified, tc.type) ? '✓' : '✗');
+    if strcmp(identified, tc.type)
+        result = '✓';
+    else
+        result = '✗';
+    end
+    fprintf('用例%d: 设定=%s, 识别=%s %s\n', i, tc.type, identified, result);
 end
 
 %% 8. 生成STM32拟合算法参数

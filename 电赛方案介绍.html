@@ -364,7 +364,7 @@
         <header class="hero">
             <div class="hero-tag">TI Cup 2025 · Problem G</div>
             <h1>电路模型探究装置</h1>
-            <sub>STM32F401 + AD9833 DDS · 自动幅度控制 · 未知电路建模 · 波形复刻</sub>
+            <sub>STM32F407VET6 · 168MHz FPU · 192KB SRAM · 内置双DAC · AD9833 DDS + ST7789 TFT</sub>
         </header>
 
         <!-- Score Metrics -->
@@ -397,25 +397,32 @@
             <div class="scope-display">
                 <div class="scope-header">
                     <span><span class="scope-dot on"></span> CH1: SYSTEM_ARCH</span>
-                    <span>STM32F401CCU6 · 84MHz · FPU</span>
-                    <span>STATUS: READY</span>
+                    <span>STM32F407VET6 · 168MHz · FPU+DSP</span>
+                    <span>2×DAC 12-bit · 3×ADC 2.4MSPS</span>
                 </div>
                 <div class="scope-diagram">
 ┌──────────────────────────────────────────────────────────────────────────┐
-│                         探究装置主机  [MCU: STM32F401CCU6]                 │
+│                         探究装置主机  [MCU: STM32F407VET6 · 168MHz]        │
 │                                                                          │
 │  ┌─────────────────┐     ┌─────────────────────┐     ┌────────────────┐  │
 │  │   SIGNAL GEN     │     │   MAIN CONTROLLER    │     │   HMI          │  │
-│  │   AD9833 DDS     │◄───►│   84MHz Cortex-M4F   │◄───►│   0.96" OLED   │  │
-│  │   0-12.5MHz      │     │   FPU + 256KB Flash  │     │   + 3× Key     │  │
-│  └────────┬─────────┘     │   内部ADC 2.4MSPS     │     └────────────────┘  │
-│           │               └──────────┬───────────┘                       │
-│  ┌────────┴─────────┐               │                                    │
-│  │  SIGNAL COND      │      ┌────────┴───────────┐                       │
-│  │  OPA2134 低通+放大 │      │  ADC FRONTEND       │                       │
-│  │  MCP41010 幅度控制 │      │  OPA2134 缓冲       │                       │
-│  └────────┬─────────┘      │  TL431 2.5V 参考     │                       │
-│           │                 └────────┬───────────┘                       │
+│  │   AD9833 DDS     │◄───►│   168MHz Cortex-M4F  │◄───►│ ST7789 2.0"   │  │
+│  │   0-12.5MHz      │     │   FPU + 192KB SRAM   │     │ 240×240 IPS   │  │
+│  │   SPI1(PA5/PA7)  │     │   512KB Flash        │     │ SPI2(PB13/15) │  │
+│  │   CS: PB2        │     │   3×ADC + 2×DAC      │     │ 65K色 60fps   │  │
+│  └────────┬─────────┘     └──────────┬───────────┘     └────────────────┘  │
+│           │                          │                                     │
+│  ┌────────┴─────────┐     ┌──────────┴───────────┐                        │
+│  │  SIGNAL COND      │     │  ADC FRONTEND         │                        │
+│  │  MCP41010 数字电位器│     │  OPA2134 缓冲         │                        │
+│  │  OPA2134 缓冲放大  │     │  TL431 2.5V 精密参考   │                        │
+│  └────────┬─────────┘     └──────────┬───────────┘                        │
+│           │                          │                                     │
+│           │               ┌──────────┴───────────┐                        │
+│           │               │  DAC OUTPUT            │                        │
+│           │               │  PA4 → OPA2134缓冲     │                        │
+│           │               │  → 波形复刻输出         │                        │
+│           │               └──────────┬───────────┘                        │
 └───────────┼──────────────────────────┼────────────────────────────────────┘
             │                          │
             ▼                          ▼
@@ -432,14 +439,14 @@
         <!-- Core Components -->
         <section class="section">
             <h2>核心器件清单</h2>
-            <p>总成本约 <strong>¥212</strong>（含第三轮审核新增 MCP41010）</p>
+            <p>总成本约 <strong>¥206</strong></p>
             <div class="comp-grid">
                 <div class="comp-item">
                     <div>
-                        <div class="comp-name">STM32F401CCU6 最小系统板</div>
-                        <div class="comp-spec">84MHz · FPU · 256KB Flash · 带调试器</div>
+                        <div class="comp-name">STM32F407VET6 最小系统板</div>
+                        <div class="comp-spec">168MHz · FPU · 512KB Flash · 192KB SRAM · 2×DAC</div>
                     </div>
-                    <div class="comp-price">¥30</div>
+                    <div class="comp-price">¥40</div>
                 </div>
                 <div class="comp-item">
                     <div>
@@ -478,10 +485,10 @@
                 </div>
                 <div class="comp-item">
                     <div>
-                        <div class="comp-name">0.96寸 OLED 显示屏</div>
-                        <div class="comp-spec">128×64 · I2C · SSD1306 · 状态显示</div>
+                        <div class="comp-name">ST7789 2.0寸 IPS TFT</div>
+                        <div class="comp-spec">240×240 · SPI · 65K色 · 60fps · 彩色Bode图</div>
                     </div>
-                    <div class="comp-price">¥18</div>
+                    <div class="comp-price">¥22</div>
                 </div>
                 <div class="comp-item">
                     <div>
@@ -514,34 +521,35 @@
             </div>
         </section>
 
-        <!-- Why F401 -->
+        <!-- Why F407 -->
         <section class="section">
             <h2>MCU选型决策</h2>
             <div class="bento">
                 <div class="bento-card">
-                    <h3>F401内部ADC vs ADS1115外置</h3>
+                    <h3>F407VET6 vs F401CCU6</h3>
                     <table>
-                        <tr><th>参数</th><th>ADS1115</th><th>F401内部ADC</th></tr>
-                        <tr><td>采样率</td><td>860 SPS <span class="tag tag-err">致命</span></td><td>2.4 MSPS ✅</td></tr>
-                        <tr><td>分辨率</td><td>16-bit</td><td>12-bit (过采样等效14-bit)</td></tr>
-                        <tr><td>50kHz每周期点数</td><td>17点 ❌</td><td>48点 ✅</td></tr>
-                        <tr><td>额外成本</td><td>¥25</td><td>¥0 (内置)</td></tr>
-                        <tr><td>FPU</td><td>无 ❌</td><td>单精度FPU ✅</td></tr>
+                        <tr><th>参数</th><th>F401CCU6</th><th>F407VET6</th></tr>
+                        <tr><td>主频</td><td>84MHz</td><td>168MHz ✅</td></tr>
+                        <tr><td>SRAM</td><td>64KB</td><td>192KB ✅</td></tr>
+                        <tr><td>Flash</td><td>256KB</td><td>512KB</td></tr>
+                        <tr><td>ADC</td><td>1×2.4MSPS</td><td>3×2.4MSPS ✅</td></tr>
+                        <tr><td>DAC</td><td><span class="tag tag-err">无</span></td><td><span class="tag tag-ok">2×12-bit</span></td></tr>
+                        <tr><td>价格</td><td>¥30</td><td>¥40</td></tr>
                     </table>
                 </div>
                 <div class="bento-card">
-                    <h3>关键优势</h3>
+                    <h3>为什么必须有DAC</h3>
                     <div class="finding">
-                        <div class="finding-sev critical" style="width:80px;">FPU</div>
-                        <div>PID控制 + Goertzel运算速度提升 10×，84MHz主频完全胜任实时控制</div>
+                        <div class="finding-sev critical" style="width:80px;">核心</div>
+                        <div>波形复刻（40分）需要输出任意补偿波形。DAC直接输出，精度可控；无DAC只能用AD9833逐谐波合成，复杂且易出错</div>
                     </div>
                     <div class="finding">
-                        <div class="finding-sev high" style="width:80px;">ADC</div>
-                        <div>省去外部ADC模块(ADS1115)，总成本减少¥30，且采样率提升2800×</div>
+                        <div class="finding-sev high" style="width:80px;">SRAM</div>
+                        <div>192KB SRAM可容纳1024点FFT缓冲区，实现完整的谐波分析和补偿</div>
                     </div>
                     <div class="finding">
-                        <div class="finding-sev medium" style="width:80px;">DAC</div>
-                        <div>内置12-bit DAC可用于合成波形输出，无需额外DAC芯片</div>
+                        <div class="finding-sev medium" style="width:80px;">生态</div>
+                        <div>F407是电赛/嵌入式竞赛最常用MCU，社区资源极丰富，CubeMX完美支持</div>
                     </div>
                 </div>
             </div>
@@ -669,7 +677,7 @@ Vin ─┤├─── V1 ──┤├─── V2 ──[OPA]──┤├─┬
                     <td>—</td>
                 </tr>
                 <tr>
-                    <td>F401 ADC精度不足</td>
+                    <td>F407 DAC输出噪声</td>
                     <td><span class="tag tag-warn">中</span></td>
                     <td><span class="tag tag-err">高</span></td>
                     <td>TL431外部参考 + 5-sample中值滤波</td>
@@ -713,13 +721,13 @@ Vin ─┤├─── V1 ──┤├─── V2 ──[OPA]──┤├─┬
             </div>
             <div class="finding">
                 <div class="finding-sev medium">P2</div>
-                <div><strong>MCU选型建议验证</strong> — F401替代F103方案正确，但需注意F401的GPIO翻转速度比F103慢，确认SPI时钟不受影响。</div>
+                <div><strong>F407时钟树配置</strong> — 168MHz需正确配置PLL: HSE 8MHz → PLL×336 → /2 = 168MHz。注意APB1=42MHz(定时器84MHz)，APB2=84MHz(定时器168MHz)。</div>
             </div>
         </section>
 
         <footer class="footer">
             <p>TI Cup 2025 · Problem G · Circuit Model Exploration Device</p>
-            <p>v3.0 — 三轮审核优化版 · 2026.06.28</p>
+            <p>v3.0 — F407VET6 + ST7789 + DAC方案 · 三轮审核 · 2026.06.28</p>
         </footer>
 
     </div>
