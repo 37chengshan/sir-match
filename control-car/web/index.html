@@ -1,0 +1,472 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>MSPM0G3507 循迹小车训练平台计划</title>
+  <style>
+    :root {
+      --bg: #f6f7f4;
+      --card: #ffffff;
+      --text: #172019;
+      --muted: #5f6b61;
+      --line: #e2e6df;
+      --accent: #256d4a;
+      --accent-2: #e9f4ed;
+      --warn: #9a5a00;
+      --warn-bg: #fff7e8;
+      --shadow: 0 18px 45px rgba(20, 40, 25, 0.08);
+      --radius: 22px;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", Arial, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 15% 0%, rgba(37, 109, 74, 0.12), transparent 34%),
+        radial-gradient(circle at 85% 8%, rgba(154, 90, 0, 0.10), transparent 30%),
+        var(--bg);
+      line-height: 1.75;
+    }
+
+    .page {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 48px 20px 80px;
+    }
+
+    .hero {
+      padding: 56px;
+      border-radius: 32px;
+      background: linear-gradient(135deg, rgba(255,255,255,0.95), rgba(239,247,241,0.95));
+      box-shadow: var(--shadow);
+      border: 1px solid rgba(255,255,255,0.8);
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 12px;
+      border-radius: 999px;
+      background: var(--accent-2);
+      color: var(--accent);
+      font-weight: 700;
+      font-size: 14px;
+      margin-bottom: 18px;
+    }
+
+    h1 {
+      font-size: clamp(34px, 5vw, 58px);
+      line-height: 1.12;
+      margin: 0 0 18px;
+      letter-spacing: -0.04em;
+    }
+
+    .subtitle {
+      max-width: 880px;
+      font-size: 20px;
+      color: var(--muted);
+      margin: 0;
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-top: 36px;
+    }
+
+    .metric {
+      padding: 20px;
+      border-radius: 18px;
+      background: #fff;
+      border: 1px solid var(--line);
+    }
+
+    .metric strong {
+      display: block;
+      font-size: 28px;
+      color: var(--accent);
+      line-height: 1.2;
+    }
+
+    .metric span {
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    section {
+      margin-top: 28px;
+      padding: 34px;
+      border-radius: var(--radius);
+      background: var(--card);
+      border: 1px solid var(--line);
+      box-shadow: 0 10px 25px rgba(20, 40, 25, 0.04);
+    }
+
+    h2 {
+      margin: 0 0 18px;
+      font-size: 28px;
+      letter-spacing: -0.02em;
+    }
+
+    h3 {
+      margin: 24px 0 10px;
+      font-size: 20px;
+    }
+
+    p { margin: 0 0 12px; }
+
+    .conclusion {
+      border-left: 6px solid var(--accent);
+      background: var(--accent-2);
+      padding: 20px 22px;
+      border-radius: 16px;
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    .warning {
+      border-left: 6px solid var(--warn);
+      background: var(--warn-bg);
+      padding: 18px 20px;
+      border-radius: 16px;
+      color: #563400;
+    }
+
+    .flow {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 12px;
+      margin-top: 18px;
+    }
+
+    .step {
+      padding: 16px 14px;
+      background: #f9faf7;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      text-align: center;
+      font-weight: 700;
+      min-height: 86px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-top: 16px;
+    }
+
+    .card {
+      padding: 22px;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: #fbfcfa;
+    }
+
+    .card h3 { margin-top: 0; }
+
+    ul, ol { padding-left: 1.35em; }
+
+    li { margin: 6px 0; }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 12px;
+      overflow: hidden;
+      border-radius: 16px;
+      font-size: 15px;
+    }
+
+    th, td {
+      border: 1px solid var(--line);
+      padding: 12px 14px;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th {
+      background: #f0f5ef;
+      color: #234432;
+    }
+
+    code {
+      background: #eef2ed;
+      padding: 2px 6px;
+      border-radius: 6px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+    }
+
+    .timeline {
+      display: grid;
+      gap: 12px;
+      counter-reset: item;
+    }
+
+    .timeline-item {
+      position: relative;
+      padding: 18px 18px 18px 58px;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: #fbfcfa;
+    }
+
+    .timeline-item::before {
+      counter-increment: item;
+      content: counter(item);
+      position: absolute;
+      left: 18px;
+      top: 20px;
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: var(--accent);
+      color: #fff;
+      display: grid;
+      place-items: center;
+      font-weight: 800;
+      font-size: 14px;
+    }
+
+    .footer {
+      margin-top: 26px;
+      color: var(--muted);
+      text-align: center;
+      font-size: 14px;
+    }
+
+    @media (max-width: 900px) {
+      .hero { padding: 34px; }
+      .hero-grid, .cards { grid-template-columns: 1fr; }
+      .flow { grid-template-columns: repeat(2, 1fr); }
+      section { padding: 24px; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <header class="hero">
+      <div class="eyebrow">电赛备赛 · MSPM0G3507 · 控制小车</div>
+      <h1>循迹小车不是终点，而是电赛控制能力的积木底座</h1>
+      <p class="subtitle">
+        本计划围绕 TI MSPM0G3507、老师提供的循迹小车 PCB、编码器电机、TB6612、电源、循迹传感器、PID、串口/OLED 调参，搭建一个可复用、可迭代、可迁移到正式电赛题目的训练平台。
+      </p>
+
+      <div class="hero-grid">
+        <div class="metric">
+          <strong>1</strong>
+          <span>一个主平台：MSPM0G3507</span>
+        </div>
+        <div class="metric">
+          <strong>3</strong>
+          <span>三批采购：基础、稳定、冲高分</span>
+        </div>
+        <div class="metric">
+          <strong>6+</strong>
+          <span>沉淀电源、电机、循迹、PID、通信、显示模块</span>
+        </div>
+      </div>
+    </header>
+
+    <section>
+      <h2>一句话结论</h2>
+      <div class="conclusion">
+        现在最应该买的不是一堆开发板，而是能把 MSPM0G3507 小车底层闭环跑稳的器材：天猛星 MSPM0G3507、小车 PCB、N20 编码器电机、TB6612、8 路灰度循迹、电源系统、USB 串口、OLED 和基础调试工具。
+      </div>
+    </section>
+
+    <section>
+      <h2>训练主线</h2>
+      <p>先把“能跑、能测、能调、能复现”做出来，再考虑视觉、云台、复杂通信。</p>
+      <div class="flow">
+        <div class="step">点灯/串口/OLED</div>
+        <div class="step">PWM 电机控制</div>
+        <div class="step">编码器测速</div>
+        <div class="step">灰度循迹</div>
+        <div class="step">速度 PID</div>
+        <div class="step">转向 PID</div>
+      </div>
+    </section>
+
+    <section>
+      <h2>分三批采购</h2>
+      <div class="cards">
+        <div class="card">
+          <h3>第一批：能跑起来</h3>
+          <ul>
+            <li>天猛星 MSPM0G3507</li>
+            <li>老师循迹小车 PCB</li>
+            <li>N20 带编码器电机 ×2</li>
+            <li>TB6612FNG ×2</li>
+            <li>8 路灰度循迹模块</li>
+            <li>18650 电池、降压模块、开关、电容</li>
+            <li>USB 转串口、OLED、杜邦线</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>第二批：能稳定调参</h3>
+          <ul>
+            <li>USB 逻辑分析仪</li>
+            <li>万用表和基础焊接工具</li>
+            <li>备用电机、备用 TB6612</li>
+            <li>蓝牙串口模块</li>
+            <li>IMU、超声波模块</li>
+            <li>白色场地布、黑色胶带</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>第三批：冲高分扩展</h3>
+          <ul>
+            <li>二自由度云台</li>
+            <li>MG90S 舵机</li>
+            <li>PCA9685 舵机驱动</li>
+            <li>OpenMV 视觉模块</li>
+            <li>靶面材料和固定支架</li>
+            <li>经老师确认的安全光源方案</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2>第一单建议</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>类别</th>
+            <th>建议购买</th>
+            <th>原因</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>主控</td>
+            <td>天猛星 MSPM0G3507 ×1；LP-MSPM0G3507 ×1 可选</td>
+            <td>统一 TI 平台，提前适应 SDK、SysConfig、官方生态</td>
+          </tr>
+          <tr>
+            <td>底盘</td>
+            <td>小车 PCB ×2；N20 编码器电机 ×2；车轮 ×2；万向轮 ×1</td>
+            <td>两轮差速结构简单，最适合先练循迹和 PID</td>
+          </tr>
+          <tr>
+            <td>驱动</td>
+            <td>TB6612FNG ×2</td>
+            <td>效率和体积更适合小车，准备一个备用</td>
+          </tr>
+          <tr>
+            <td>传感</td>
+            <td>8 路灰度循迹模块 ×1</td>
+            <td>可计算偏差，适合转向 PID</td>
+          </tr>
+          <tr>
+            <td>电源</td>
+            <td>18650、电池盒、5V 3A 降压、开关、指示灯、电解电容</td>
+            <td>电机干扰和供电不稳是小车最常见问题</td>
+          </tr>
+          <tr>
+            <td>调试</td>
+            <td>USB 转串口、OLED、万用表、USB 逻辑分析仪</td>
+            <td>能看到数据，才能快速定位问题和调 PID</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section>
+      <h2>五周推进路线</h2>
+      <div class="timeline">
+        <div class="timeline-item">
+          <strong>第 1 周：MSPM0G3507 基础外设</strong><br />
+          点灯、按键、串口、PWM、ADC、OLED、定时器。目标是开发环境彻底打通。
+        </div>
+        <div class="timeline-item">
+          <strong>第 2 周：小车基础运动</strong><br />
+          电机正反转、左右轮 PWM 调速、循迹模块读取、基础循迹跑圈。
+        </div>
+        <div class="timeline-item">
+          <strong>第 3 周：闭环控制</strong><br />
+          编码器测速、速度 PID、转向 PID、串口调参、OLED 显示参数。
+        </div>
+        <div class="timeline-item">
+          <strong>第 4 周：工程化改进</strong><br />
+          电源抗干扰、线束整理、模块固定、接线图、故障排查表、测试数据记录。
+        </div>
+        <div class="timeline-item">
+          <strong>第 5 周以后：冲高分模块</strong><br />
+          视觉、云台、IMU、蓝牙调参、路径规划、数据记录和报告模板。
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2>暂时不要优先做</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>不优先</th>
+            <th>原因</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>直接上树莓派/K230</td>
+            <td>系统复杂度太高，小车底层不稳时会拖慢整体进度</td>
+          </tr>
+          <tr>
+            <td>四驱/麦克纳姆轮</td>
+            <td>控制模型复杂，不适合第一版练 PID 循迹</td>
+          </tr>
+          <tr>
+            <td>L298N 作为主驱动</td>
+            <td>发热大、效率低，推荐 TB6612FNG</td>
+          </tr>
+          <tr>
+            <td>无编码器电机</td>
+            <td>难以训练速度闭环，后期 PID 价值低</td>
+          </tr>
+          <tr>
+            <td>大量不同开发板</td>
+            <td>会分散精力，先玩透 MSPM0G3507</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section>
+      <h2>安全和避坑</h2>
+      <div class="warning">
+        MSPM0G3507 不要使用 ST-LINK 下载；ST-LINK 留给 STM32。电机、舵机不要直接从开发板取大电流。所有模块必须共地。光源/激光相关实验必须经过老师或实验室安全确认，早期用普通 LED 或低风险指示光源替代即可。
+      </div>
+    </section>
+
+    <section>
+      <h2>最后的判断标准</h2>
+      <p>这个项目做得好不好，不看有没有炫酷外设，而看下面这些是否稳定：</p>
+      <ol>
+        <li>MSPM0G3507 工程能稳定下载和调试；</li>
+        <li>电机一转开发板不复位；</li>
+        <li>编码器速度数据稳定可信；</li>
+        <li>灰度传感器能稳定识别黑线；</li>
+        <li>小车能低速循迹跑完整圈；</li>
+        <li>速度 PID 和转向 PID 可通过串口快速调参；</li>
+        <li>OLED 能显示模式、速度、偏差、电池电压和 PID 参数；</li>
+        <li>接线、参数、测试数据有文档可复现。</li>
+      </ol>
+    </section>
+
+    <div class="footer">
+      文件位置：<code>control-car/web/index.html</code>。详细执行方案见 <code>control-car/docs/AI-IMPLEMENTATION-PLAN.md</code>。
+    </div>
+  </main>
+</body>
+</html>
