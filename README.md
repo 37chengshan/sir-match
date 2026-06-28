@@ -9,7 +9,7 @@
 1. 根目录说明文件：`README.md`、`CLAUDE.md`、`AGENTS.md`；
 2. `common/`：通用算法、通用硬件模块、通用测试方法；
 3. `比赛文档/`：总要求、训练计划、采购原则、官方资料摘要；
-4. 每个题目一个顶层文件夹，例如 `G-circuit-model/`。
+4. 每个题目一个顶层文件夹，例如 `G-circuit-model/`、`control-car/`。
 
 以后不要再使用二级 `problems/题目名/` 结构，新题目直接在仓库顶层新建文件夹。
 
@@ -30,17 +30,35 @@ sir-match/
 │   ├── README.md
 │   ├── 00-总要求.md
 │   └── 01-MSPM0G3507训练计划.md
-└── G-circuit-model/
+├── G-circuit-model/
+│   ├── README.md
+│   ├── docs/
+│   │   └── solution-MSPM0G3507.md
+│   ├── firmware/
+│   │   └── mspm0/
+│   ├── simulation/
+│   │   └── matlab/
+│   ├── hardware/
+│   ├── test-data/
+│   ├── report/
+│   └── web/
+│       └── index.html
+└── control-car/
     ├── README.md
     ├── docs/
-    │   └── solution-MSPM0G3507.md
+    │   ├── AI-IMPLEMENTATION-PLAN.md
+    │   └── purchase-and-build-plan.md
     ├── firmware/
     │   └── mspm0/
-    ├── simulation/
-    │   └── matlab/
+    │       └── README.md
     ├── hardware/
+    │   └── README.md
+    ├── simulation/
+    │   └── README.md
     ├── test-data/
+    │   └── README.md
     ├── report/
+    │   └── README.md
     └── web/
         └── index.html
 ```
@@ -50,13 +68,16 @@ sir-match/
 | 题目 | 顶层文件夹 | 主控平台 | 当前状态 |
 |---|---|---|---|
 | G题：电路模型探究装置 | `G-circuit-model/` | MSPM0G3507 | 方案、采购、训练计划已结构化 |
+| 小车训练平台：循迹/PID/通信/显示积木库 | `control-car/` | MSPM0G3507 | 采购计划、AI 实施计划、展示页已创建 |
 
 ## 当前先做什么
 
 1. 看 `比赛文档/01-MSPM0G3507训练计划.md`。
-2. 买第一批必备器材：MSPM0G3507、AD9833、OLED、运放、阻容感、电源、面包板、USB转串口。
-3. 在 `G-circuit-model/firmware/mspm0/` 新建真正的 MSPM0G3507 工程。
-4. 先跑通最小闭环：AD9833 输出 → 模型电路 → MSPM0G3507 双 ADC 采样 → Goertzel 算幅相 → OLED/串口显示。
+2. G题方向：买第一批必备器材：MSPM0G3507、AD9833、OLED、运放、阻容感、电源、面包板、USB转串口。
+3. 小车方向：看 `control-car/web/index.html` 和 `control-car/docs/purchase-and-build-plan.md`，优先购买 MSPM0G3507、小车 PCB、N20 编码器电机、TB6612、8路灰度、电源和调试工具。
+4. 在 `G-circuit-model/firmware/mspm0/` 新建真正的 MSPM0G3507 工程。
+5. G题先跑通最小闭环：AD9833 输出 → 模型电路 → MSPM0G3507 双 ADC 采样 → Goertzel 算幅相 → OLED/串口显示。
+6. 小车先跑通最小闭环：PWM 输出 → TB6612 电机控制 → 编码器测速 → 灰度循迹 → 速度 PID/转向 PID → OLED/串口调参。
 
 ## 顶层题目文件夹规则
 
