@@ -113,6 +113,50 @@ power-converter/
 - 题目专用内容：对应顶层题目文件夹
 - agent/Claude/Codex 说明：根目录 `CLAUDE.md` 和 `AGENTS.md`
 
+## 多人协作
+
+### 工作流程
+
+```text
+同步 main → 新建分支 → 修改 → commit → push → 开 PR → CI 检查 → Review → 合并
+```
+
+### 分支命名
+
+| 前缀 | 用途 | 示例 |
+|------|------|------|
+| `docs/` | 文档 | `docs/control-car-wiring` |
+| `firmware/` | 固件代码 | `firmware/control-car-pid` |
+| `hardware/` | 硬件资料 | `hardware/control-car-pinmap` |
+| `ci/` | CI/脚本 | `ci/prgate` |
+| `fix/` | 修复 | `fix/readme-links` |
+| `topic/` | 新题目 | `topic/power-converter` |
+
+### PR 要求
+
+每个 PR 必须说明：
+1. 改了什么
+2. 为什么改
+3. 影响范围（勾选被改动的目录）
+4. 验证方式（文档自查 / CI 通过 / 编译通过 / 实物测试）
+
+### CI 门禁
+
+`repo-structure-gate` 自动检查仓库结构：
+- 根目录必须存在 `README.md`、`AGENTS.md`、`CLAUDE.md`
+- 必须存在 `common/`、`比赛文档/`、`G-circuit-model/`、`control-car/`
+- 禁止旧目录 `problems/`、`docs/`、`stm32/`、`matlab/`、`agent/`
+- 每个题目文件夹必须有 `README.md`
+
+门禁未通过时无法合并，请按报错信息修正。
+
+### 治理文件
+
+- `.github/CODEOWNERS` — 代码审核职责
+- `.github/PULL_REQUEST_TEMPLATE.md` — PR 模板
+- `CONTRIBUTING.md` — 贡献指南
+- `GOVERNANCE.md` — 治理规则详情
+
 ## 已清理内容
 
 旧的 `stm32/`、`matlab/`、`docs/`、`problems/`、`agent/` 和根目录旧方案文件不再作为新结构的一部分。后续所有新增内容按本 README 放置。
