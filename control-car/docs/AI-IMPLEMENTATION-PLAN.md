@@ -2,7 +2,7 @@
 
 > 面向对象：Claude、Codex、ChatGPT、Cursor、其他代码代理。  
 > 核心目标：把 `control-car/` 做成电赛控制类题目的可复用训练平台，而不是一次性 demo。  
-> 当前优先级：先打通 MSPM0G3507 + 电机 + 编码器 + 循迹 + PID + 串口/OLED 调参。
+> 当前优先级：先打通 MSPM0G3507 + 电机 + 编码器 + 灰度循迹 + PID + 串口/OLED 调参；视觉主线统一为 **庐山派 K230 / CanMV K230**，但必须在底层闭环稳定后接入。
 
 ---
 
@@ -15,6 +15,7 @@ AI 在处理本文件夹任务时，必须按以下顺序阅读：
 3. `control-car/README.md`：确认本题目定位。
 4. 本文件：执行具体任务。
 5. `docs/purchase-and-build-plan.md`：确认硬件器材和阶段。
+6. `docs/k230-vision-plan.md`：确认 K230 视觉协处理器方案。
 
 不要把本题目文件放入 `problems/`、`agent/`、旧 `docs/` 或根目录零散文件。所有小车专用内容都放在 `control-car/` 内。
 
@@ -28,22 +29,31 @@ AI 在处理本文件夹任务时，必须按以下顺序阅读：
 电源稳定
 → 电机驱动
 → 编码器测速
-→ 循迹传感器读取
+→ 灰度循迹传感器读取
 → 速度 PID
 → 转向 PID
 → OLED/串口调参
 → 模块化代码库
-→ 可迁移到云台、视觉、避障、通信等题目
+→ K230 视觉协处理
+→ 云台/靶面/识别扩展
 ```
 
 AI 的实现目标是输出一个结构清晰、可渐进实现、可测试、可复用、适合电赛现场快速调试的 MSPM0G3507 小车工程骨架。
+
+关键分工：
+
+```text
+MSPM0G3507：实时控制、电机、编码器、PID、状态机、安全保护
+庐山派 K230：视觉识别、目标坐标、视觉偏差、类别/二维码/AprilTag 结果
+UART：K230 → MSPM0 的低耦合通信边界
+```
 
 ---
 
 ## 2. 当前硬件（已验证，来自参考案例）
 
-> 全部引脚来自 `D:\work\参考文件-已实现案例\2026_04_地猛星电赛控制题配套资料\【小车】03_PID_car_灰度模块小车巡线\11_PID_car\Debug\ti_msp_dl_config.h`（SysConfig 生成）。
-> 不要使用其他来源的引脚号。
+> 小车全部 MSPM0 引脚来自 `D:\work\参考文件-已实现案例\2026_04_地猛星电赛控制题配套资料\【小车】03_PID_car_灰度模块小车巡线\11_PID_car\Debug\ti_msp_dl_config.h`（SysConfig 生成）。  
+> 不要使用其他来源的 MSPM0 引脚号。
 
 ### 2.1 主控
 
@@ -82,9 +92,11 @@ PWM 频率 10kHz（40MHz/4000），最大占空比 4000。
 | 右 B 相 | **PB20** |
 
 速度计算公式：
+
 ```c
 speed_mm_s = counter / 260.0f * 3.14f * 67.0f * 20.0f;
 ```
+
 counter 在每个控制周期清零。
 
 ### 2.5 循迹传感器（真实引脚）
@@ -109,24 +121,16 @@ TIMA0，40MHz / 40000 = **1kHz** PID 控制频率（LOAD_VALUE=39999）。
 - UART：115200 8N1
 - 按键：START + MODE
 
-### 2.8 参考案例索引
+### 2.8 K230 视觉协处理器
 
-```
-D:\work\参考文件-已实现案例\2026_04_地猛星电赛控制题配套资料\
-  ├── 【小车】01_DC_MOTOR_PID_1/    TB6612 基本旋转（user_driver/motor.c）
-  ├── 【小车】02_DC_MOTOR_PID_2/    编码器测速（user_driver/motor.c）
-  ├── 【小车】02_DC_MOTOR_PID_3/    增量式 PI 闭环（user_driver/motor.c）
-  └── 【小车】03_PID_car/           双电机+灰度循迹（user_driver/motor.c, huidu.c）
-```
-
-参考案例中已发现的不足（需要改进）：
-1. 只有电机 1 代码激活，电机 2 被注释掉
-2. PID 没有结构体封装，无输出限幅/积分限幅
-3. 没有状态机
-4. 循迹用 if-else 分支而非加权偏差算法
-5. main.c 中大量死代码
-6. 无 UART 调参协议
-7. OLED 只在初始化使用，运行时未显示状态
+| 项目 | 要求 |
+|---|---|
+| 模块 | 立创·庐山派 K230 / CanMV K230 |
+| 角色 | 视觉协处理器，不做小车主控 |
+| 存储 | TF 卡 8GB/16GB，Class 10/U1 及以上 |
+| 供电 | 独立 5V 稳压，建议 2A 以上 |
+| 通信 | UART 115200 8N1，TX/RX/GND，必须共地 |
+| 输出 | `VISION,...` 文本帧 |
 
 ---
 
@@ -151,44 +155,34 @@ control-car/firmware/mspm0/
 │   │   ├── board_clock.c
 │   │   └── board_clock.h
 │   ├── drivers/
-│   │   ├── motor_tb6612.c
-│   │   ├── motor_tb6612.h
-│   │   ├── encoder.c
-│   │   ├── encoder.h
-│   │   ├── line_sensor.c
-│   │   ├── line_sensor.h
-│   │   ├── oled_i2c.c
-│   │   ├── oled_i2c.h
-│   │   ├── button.c
-│   │   ├── button.h
-│   │   ├── buzzer.c
-│   │   ├── buzzer.h
-│   │   ├── battery_adc.c
-│   │   └── battery_adc.h
+│   │   ├── motor_tb6612.c/h
+│   │   ├── encoder.c/h
+│   │   ├── line_sensor.c/h
+│   │   ├── oled_i2c.c/h
+│   │   ├── button.c/h
+│   │   ├── buzzer.c/h
+│   │   └── battery_adc.c/h
 │   ├── control/
-│   │   ├── pid.c
-│   │   ├── pid.h
-│   │   ├── speed_control.c
-│   │   ├── speed_control.h
-│   │   ├── line_control.c
-│   │   └── line_control.h
+│   │   ├── pid.c/h
+│   │   ├── speed_control.c/h
+│   │   └── line_control.c/h
 │   ├── protocol/
-│   │   ├── uart_protocol.c
-│   │   └── uart_protocol.h
+│   │   ├── uart_protocol.c/h
+│   │   └── vision_protocol.c/h       # K230 VISION 帧解析
 │   └── utils/
-│       ├── ring_buffer.c
-│       ├── ring_buffer.h
-│       ├── lowpass_filter.c
-│       └── lowpass_filter.h
+│       ├── ring_buffer.c/h
+│       └── lowpass_filter.c/h
 ├── config/
 │   ├── pinmap-default.md
 │   ├── pid-defaults.md
-│   └── serial-protocol.md
+│   ├── serial-protocol.md
+│   └── vision-uart-protocol.md
 └── tests/
     ├── motor-test.md
     ├── encoder-test.md
     ├── line-sensor-test.md
-    └── pid-tuning-log.md
+    ├── pid-tuning-log.md
+    └── k230-uart-test.md
 ```
 
 如果暂时没有真实 CCS 工程，先提交文档和接口骨架，不要伪造不可编译的大段代码。
@@ -197,14 +191,14 @@ control-car/firmware/mspm0/
 
 ## 4. 固件分层设计
 
-### 4.1 分层原则
-
 ```text
 main.c
   ↓
 app 层：状态机、模式切换、任务调度
   ↓
-control 层：PID、速度环、循迹环
+control 层：PID、速度环、循迹环、视觉辅助控制
+  ↓
+protocol 层：UART 命令、K230 VISION 帧解析
   ↓
 drivers 层：电机、编码器、循迹、OLED、按键、蜂鸣器、ADC
   ↓
@@ -216,12 +210,11 @@ AI 写代码时必须避免：
 - 把所有逻辑塞进 `main.c`；
 - 把 PID 和电机 GPIO 控制混在一起；
 - 把硬件引脚硬编码在多个文件里；
+- K230 数据解析和运动控制强耦合；
 - 无注释魔法数；
 - 没有状态机，靠 delay 死等。
 
-### 4.2 任务周期建议
-
-建议使用 1ms 系统 tick，再分频调度：
+### 4.1 任务周期建议
 
 | 任务 | 周期 | 内容 |
 |---|---:|---|
@@ -230,8 +223,10 @@ AI 写代码时必须避免：
 | line sensor update | 5ms / 10ms | 读取循迹偏差 |
 | speed PID | 10ms | 左右轮速度闭环 |
 | line PID | 10ms | 根据循迹偏差计算转向量 |
+| vision frame parse | loop / 1ms | 解析 K230 UART 接收缓冲 |
+| vision timeout check | 10ms / 20ms | 超时降级、报警或停车 |
 | OLED refresh | 100ms / 200ms | 刷新状态 |
-| UART parse | 1ms / loop | 解析串口命令 |
+| UART command parse | 1ms / loop | 解析调参命令 |
 | key scan | 10ms | 按键消抖 |
 | battery adc | 100ms / 500ms | 电池电压检测 |
 
@@ -251,6 +246,9 @@ typedef enum {
     CAR_STATE_LINE_FOLLOW_OPEN_LOOP,
     CAR_STATE_SPEED_PID_TEST,
     CAR_STATE_LINE_FOLLOW_PID,
+    CAR_STATE_K230_UART_TEST,
+    CAR_STATE_VISION_ASSIST,
+    CAR_STATE_GIMBAL_TEST,
     CAR_STATE_ERROR,
 } car_state_t;
 ```
@@ -267,7 +265,10 @@ typedef enum {
 | LINE_FOLLOW_OPEN_LOOP | 不用 PID 的基础循迹 |
 | SPEED_PID_TEST | 速度闭环单独测试 |
 | LINE_FOLLOW_PID | 速度环 + 转向环联动循迹 |
-| ERROR | 低电压、传感器异常、电机异常等 |
+| K230_UART_TEST | 只验证 K230 串口帧收发，不控制电机 |
+| VISION_ASSIST | K230 视觉辅助循迹或目标定位 |
+| GIMBAL_TEST | 云台电机/舵机单独测试 |
+| ERROR | 低电压、传感器异常、电机异常、视觉超时等 |
 
 AI 实现时所有模式切换必须可由 UART 命令或按键触发。
 
@@ -304,38 +305,24 @@ void pid_set_limit(pid_t *pid, float out_min, float out_max,
                    float i_min, float i_max);
 ```
 
-必须有：
-
-- 输出限幅；
-- 积分限幅；
-- PID reset；
-- dt 参数；
-- 串口动态改参数能力。
+必须有：输出限幅、积分限幅、PID reset、dt 参数、串口动态改参数能力。
 
 ### 6.2 速度环
 
-输入：编码器计算出的左右轮速度。  
-输出：左右轮 PWM。
+输入：编码器计算出的左右轮速度。输出：左右轮 PWM。
 
 ```text
 left_target_speed  -> left_speed_pid  -> left_pwm
 right_target_speed -> right_speed_pid -> right_pwm
 ```
 
-需要预留：
-
-- 左右电机方向修正；
-- 左右电机 PWM 死区补偿；
-- 左右轮速度标定系数；
-- 最大 PWM 限制；
-- 起步 PWM。
+需要预留：左右电机方向修正、PWM 死区补偿、速度标定系数、最大 PWM 限制、起步 PWM。
 
 ### 6.3 转向环 / 循迹环
 
-输入：循迹偏差 `line_error`。  
-输出：转向修正量 `turn_correction`。
+输入：灰度循迹偏差 `line_error` 或视觉偏差 `vision_error`。输出：转向修正量 `turn_correction`。
 
-推荐第一版公式：
+第一版只用灰度：
 
 ```text
 base_speed = 固定基础速度
@@ -344,14 +331,14 @@ left_target_speed  = base_speed - turn
 right_target_speed = base_speed + turn
 ```
 
-后续扩展：
+K230 接入后，视觉只能作为增强输入，不得破坏灰度基础闭环：
 
-- 急弯降速；
-- 丢线处理；
-- 十字线/弯道识别；
-- 圈数统计；
-- 起点识别；
-- 曲率前馈。
+```text
+if vision_ok && vision_conf >= threshold:
+    fused_error = line_error * line_weight + vision_error * vision_weight
+else:
+    fused_error = line_error
+```
 
 ---
 
@@ -372,35 +359,15 @@ S0 S1 S2 S3 S4 S5 S6 S7
 line_error = sum(active_i * weight_i) / active_count
 ```
 
-若没有检测到黑线：
-
-- 使用上一次偏差方向继续转向；
-- 限速；
-- 进入 `line_lost_count` 计数；
-- 超过阈值进入 ERROR 或 SEARCH 状态。
+若没有检测到黑线：使用上一次偏差方向继续低速搜索，超过阈值进入 ERROR 或 SEARCH 状态。
 
 ### 7.2 模拟量版本
 
-若使用 ADC 灰度值：
-
-1. 每路做白底/黑线标定；
-2. 转换为归一化黑线强度；
-3. 用加权平均得到偏差；
-4. 用低通滤波减少抖动。
-
-标定数据必须存入文档或后续 NVM：
-
-```text
-sensor_i_white
-sensor_i_black
-threshold_i
-```
+若使用 ADC 灰度值：每路做白底/黑线标定，转换为归一化黑线强度，用加权平均得到偏差，再低通滤波。
 
 ---
 
 ## 8. 编码器设计
-
-### 8.1 基本目标
 
 必须完成：
 
@@ -410,42 +377,22 @@ threshold_i
 4. 显示/串口输出左右轮速度；
 5. 用速度反馈做 PID。
 
-### 8.2 参数
-
 代码中必须集中定义：
 
 ```c
-#define ENCODER_PPR          具体值待实测
-#define MOTOR_GEAR_RATIO     具体值待实测
-#define WHEEL_DIAMETER_MM    具体值待实测
+#define ENCODER_PPR          260
+#define MOTOR_GEAR_RATIO     20.0f
+#define WHEEL_DIAMETER_MM    67.0f
 #define CONTROL_PERIOD_MS    10
 ```
 
-AI 不要随意编造电机参数。未确认时用 `TODO_MEASURE` 注释。
-
-### 8.3 速度换算
-
-基本思路：
-
-```text
-pulses_per_period → pulses_per_second → wheel_rps → mm_per_second
-```
-
-如果电机编码器是 AB 相正交编码器，需确认是单边沿计数、双边沿计数还是四倍频计数。
+如果实物参数不同，必须实测后更新，不要凭空编造。
 
 ---
 
 ## 9. UART 调参协议
 
-### 9.1 设计原则
-
-- 人可手打；
-- 便于串口助手使用；
-- 每条命令一行；
-- 参数错误要返回错误提示；
-- 所有关键状态可查询。
-
-### 9.2 推荐命令
+### 9.1 人机调参命令
 
 ```text
 help
@@ -457,6 +404,8 @@ mode line_test
 mode follow_open
 mode speed_pid
 mode follow_pid
+mode k230_uart_test
+mode vision_assist
 
 motor left 300
 motor right 300
@@ -470,19 +419,19 @@ speed right 200
 pid speed_l 1.0 0.0 0.0
 pid speed_r 1.0 0.0 0.0
 pid line 1.0 0.0 0.0
+pid vision 1.0 0.0 0.0
 pid show
 pid reset
 
 sensor show
 encoder show
+vision show
 battery show
 log on
 log off
 ```
 
-### 9.3 返回格式
-
-建议返回：
+### 9.2 返回格式
 
 ```text
 OK: message
@@ -494,11 +443,50 @@ DATA: key=value,key=value
 
 ```text
 DATA: state=FOLLOW_PID,base=220,line_error=-3.2,left_speed=198,right_speed=242,batt=7.41
+DATA: vision_mode=LINE,vision_ok=1,cx=154,cy=102,err=-6,conf=83,age_ms=24
 ```
 
 ---
 
-## 10. OLED 页面设计
+## 10. K230 视觉协议
+
+K230 到 MSPM0 使用“一行一帧”的 ASCII 协议，便于串口助手调试。
+
+```text
+VISION,MODE=LINE,OK=1,CX=154,CY=102,ERR=-6,CONF=83
+VISION,MODE=BLOB,OK=1,CX=121,CY=88,W=34,H=29,ID=RED,CONF=90
+VISION,MODE=TAG,OK=1,ID=3,CX=118,CY=92,ROT=-12,CONF=95
+VISION,MODE=QR,OK=1,DATA=START_A,CONF=99
+VISION,MODE=NONE,OK=0,ERR=LOST,CONF=0
+```
+
+MSPM0 侧最小结构体建议：
+
+```c
+typedef struct {
+    uint8_t ok;
+    char mode[12];
+    int16_t cx;
+    int16_t cy;
+    int16_t err;
+    int16_t w;
+    int16_t h;
+    int16_t id;
+    int16_t conf;
+    uint32_t last_update_ms;
+} vision_result_t;
+```
+
+安全要求：
+
+- `last_update_ms` 超时 100~300ms 必须降级；
+- `OK=0` 不允许继续用旧坐标高速控制；
+- `CONF` 过低不参与闭环；
+- K230 丢帧不能导致 MSPM0 卡死。
+
+---
+
+## 11. OLED 页面设计
 
 第一页：运行状态
 
@@ -527,160 +515,80 @@ L: 198
 R: 242
 ```
 
+第四页：K230 视觉
+
+```text
+VIS: LINE OK
+CX:154 CY:102
+ERR:-6 CF:83
+AGE:24ms
+```
+
 OLED 不要高频刷新，建议 100~200ms 一次。
 
 ---
 
-## 11. 电源与抗干扰要求
+## 12. 电源与抗干扰要求
 
 AI 在写硬件说明或接线图时必须强调：
 
 1. 电机电源和逻辑电源要分清；
 2. MSPM0 不要直接给电机供电；
-3. 舵机/电机不要直接从开发板 5V 引脚取大电流；
-4. 电机驱动附近加大电解电容；
-5. 逻辑 GND 与电机 GND 必须共地；
-6. 电池电压要监测；
-7. 线束要固定，避免跑车时接触不良；
-8. 小车控制和瞄准模块后续需要独立开关与电源指示。
+3. K230 建议独立 5V/2A 以上供电；
+4. 舵机/电机不要直接从开发板 5V 引脚取大电流；
+5. 电机驱动附近加大电解电容；
+6. 逻辑 GND、K230 GND 与电机 GND 必须共地；
+7. 电池电压要监测；
+8. 线束要固定，避免跑车时接触不良；
+9. TF 卡运行中不要插拔。
 
 ---
 
-## 12. 分阶段任务拆解
+## 13. 分阶段任务拆解
 
 ### 阶段 1：最小硬件闭环
 
-目标：让 MSPM0G3507 能控制电机并读回基础传感器。
+目标：MSPM0G3507 能控制电机并读回基础传感器。
 
-任务：
-
-1. 建 `firmware/mspm0/README.md`；
-2. 建 pin map 文档；
-3. 明确 TB6612 引脚；
-4. 实现/规划 PWM 输出；
-5. 实现左右电机正反转；
-6. 实现电机 stop/brake；
-7. 串口输出启动日志；
-8. OLED 显示 BOOT/IDLE。
-
-验收：
-
-- 左轮可正转/反转/停止；
-- 右轮可正转/反转/停止；
-- PWM 从低到高可明显调速；
-- 串口能看到状态；
-- 小车不会一上电乱跑。
+验收：左右轮可正反转/停止，PWM 可调速，串口/OLED 有状态，小车不会一上电乱跑。
 
 ### 阶段 2：编码器测速
 
-任务：
+验收：手转轮子计数方向正确，PWM 增大速度增大，能测出电机死区。
 
-1. 确认编码器供电电压；
-2. 确认左右编码器 A/B 相接线；
-3. 读取脉冲；
-4. 判断方向；
-5. 计算速度；
-6. OLED/串口显示速度；
-7. 记录不同 PWM 下速度表。
+### 阶段 3：灰度循迹传感器
 
-验收：
-
-- 手转轮子，计数方向正确；
-- 左右轮速度数值稳定；
-- PWM 增大时速度增大；
-- 能测出电机死区。
-
-### 阶段 3：循迹传感器
-
-任务：
-
-1. 读取 5 路/8 路传感器；
-2. 输出二进制传感器状态；
-3. 做黑白阈值标定；
-4. 计算 line_error；
-5. 处理丢线；
-6. 实现 open-loop 循迹。
-
-验收：
-
-- 黑线左偏时 error 为负；
-- 黑线右偏时 error 为正；
-- 中间压线时 error 接近 0；
-- 基础循迹能慢速跑完整圈。
+验收：黑线左偏 error 为负，右偏为正，中间接近 0，基础循迹能慢速跑完整圈。
 
 ### 阶段 4：速度 PID
 
-任务：
-
-1. 实现通用 PID；
-2. 左右轮各一个速度 PID；
-3. 串口可调 kp/ki/kd；
-4. 记录阶跃响应；
-5. 加输出限幅和积分限幅。
-
-验收：
-
-- 目标速度改变后能平稳跟踪；
-- 左右轮同目标速度时直线偏航明显减少；
-- 电池电压变化时速度仍相对稳定。
+验收：目标速度改变后能平稳跟踪，左右轮同目标速度时直线偏航减少。
 
 ### 阶段 5：循迹 PID
 
-任务：
-
-1. line_error 输入转向 PID；
-2. 输出左右轮目标速度差；
-3. 急弯降速；
-4. 丢线恢复；
-5. 串口调参；
-6. OLED 显示当前偏差和 PID 参数。
-
-验收：
-
-- 小车能稳定沿黑线跑；
-- 不频繁左右振荡；
-- 弯道不冲出线；
-- 可通过串口快速调参数。
+验收：小车稳定沿黑线跑，不频繁左右振荡，弯道不冲出线，可串口快速调参。
 
 ### 阶段 6：工程化沉淀
 
-任务：
+验收：换一个同学也能按文档复现接线，PID 参数可追溯，代码模块可迁移。
 
-1. 写接线图；
-2. 写故障排查表；
-3. 写调参记录模板；
-4. 写测试数据 CSV 格式；
-5. 写模块接口文档；
-6. 准备报告素材。
+### 阶段 7：K230 单板练习
 
-验收：
+任务：TF 卡烧录、CanMV 启动、摄像头预览、基础视觉例程。
 
-- 换一个同学也能按文档复现接线；
-- 出问题能根据故障表定位；
-- PID 参数可追溯；
-- 代码模块可迁移到后续题目。
+验收：K230 不接 MSPM0 时也能稳定输出视觉结果。
 
----
+### 阶段 8：K230 UART 接入 MSPM0
 
-## 13. 未来扩展：云台/视觉/瞄准
+任务：K230 输出 `VISION,...`，MSPM0 解析并 OLED 显示。
 
-在小车底盘稳定之前，不要优先实现视觉云台。
+验收：视觉丢失或断开 K230 时，MSPM0 能超时报警/降级/停车。
 
-扩展顺序：
+### 阶段 9：视觉辅助循迹/云台
 
-1. 二自由度舵机云台；
-2. PCA9685 舵机驱动；
-3. OpenMV 矩形识别/色块识别；
-4. UART 传输目标偏差；
-5. 云台 PID；
-6. 小车行驶状态与云台补偿耦合；
-7. 靶面标定与数据拟合。
+任务：K230 输出偏差或坐标，MSPM0 低速验证视觉辅助控制。
 
-安全要求：
-
-- 光源/激光相关实验必须经过老师或实验室安全确认；
-- 调试阶段优先使用普通 LED 或低风险可见光替代；
-- 不要把光源照向人眼、皮肤或反光表面。
+验收：视觉只增强系统，不破坏灰度基础闭环。
 
 ---
 
@@ -694,6 +602,8 @@ hardware/wiring-guide.md
 hardware/power-design.md
 firmware/mspm0/config/serial-protocol.md
 firmware/mspm0/config/pid-defaults.md
+firmware/mspm0/config/vision-uart-protocol.md
+docs/k230-vision-plan.md
 test-data/pid-tuning-log.md
 report/technical-notes.md
 ```
@@ -721,6 +631,13 @@ time_ms,target_speed,left_speed,right_speed,left_pwm,right_pwm,kp,ki,kd
 0,200,0,0,0,0,1.0,0.0,0.0
 ```
 
+`test-data/k230_vision_log.csv`
+
+```csv
+time_ms,mode,ok,cx,cy,err,conf,age_ms,note
+0,LINE,1,154,102,-6,83,24,start
+```
+
 ---
 
 ## 15. AI 输出质量要求
@@ -736,7 +653,8 @@ AI 每次修改后必须自查：
 7. 是否没有胡编真实引脚？
 8. 是否没有建议使用 ST-LINK 烧 MSPM0？
 9. 是否强调电源安全与共地？
-10. 是否能被另一个同学复现？
+10. 是否明确 K230 只做视觉协处理器？
+11. 是否能被另一个同学复现？
 
 ---
 
@@ -747,13 +665,15 @@ AI 不要：
 - 不确认引脚就写死板级代码；
 - 用 STM32 HAL 思路硬套 MSPM0；
 - 写不可编译的“看起来很完整”的工程；
-- 一开始上树莓派、K230、OpenCV 大系统；
+- 一开始就依赖 K230 让小车动起来；
+- 让 K230 替代 MSPM0 控制电机/PID；
 - 推荐 L298N 作为主方案；
 - 推荐无编码器电机作为 PID 训练主方案；
 - 把光源/激光作为早期必做项目；
 - 忽略电源、电机干扰、接线固定；
 - 忽略调参入口；
-- 忽略测试数据记录。
+- 忽略测试数据记录；
+- 把 OpenMV 写成当前主线。
 
 ---
 
@@ -767,14 +687,16 @@ AI 不要：
 3. control-car/hardware/wiring-guide.md
 4. control-car/firmware/mspm0/config/serial-protocol.md
 5. control-car/firmware/mspm0/config/pid-defaults.md
-6. 一套 MSPM0G3507 工程骨架或伪代码级接口设计
-7. OLED/串口调试说明
-8. 电机、编码器、循迹、PID 的分阶段验收表
+6. control-car/firmware/mspm0/config/vision-uart-protocol.md
+7. control-car/docs/k230-vision-plan.md
+8. 一套 MSPM0G3507 工程骨架或伪代码级接口设计
+9. OLED/串口调试说明
+10. 电机、编码器、循迹、PID、K230 UART 的分阶段验收表
 ```
 
 MVP 验收句：
 
-> 小车可以在 MSPM0G3507 控制下完成左右电机调速、编码器测速、循迹传感器读数、基础循迹和串口/OLED 状态显示，并具备继续加入速度 PID、转向 PID 的代码结构。
+> 小车可以在 MSPM0G3507 控制下完成左右电机调速、编码器测速、循迹传感器读数、基础循迹和串口/OLED 状态显示；K230 作为视觉协处理器可以通过 UART 输出结构化视觉结果，MSPM0 能解析、显示并在安全超时机制下使用该结果。
 
 ---
 
@@ -787,5 +709,5 @@ MVP 验收句：
 3. 在 `control-car/hardware/` 创建引脚表、接线教程、电源设计说明。
 4. 先写文档和接口，不要乱猜实际 PCB 引脚。
 5. 等用户上传 PCB 原理图/焊接图后，再填写真实 pin map。
-6. 若要写代码，先写通用 PID、状态机、串口协议、驱动接口骨架。
+6. 若要写代码，先写通用 PID、状态机、串口协议、K230 VISION 帧解析、驱动接口骨架。
 7. 每次提交都保证能解释“这个文件解决了哪个电赛训练问题”。
