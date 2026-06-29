@@ -1,285 +1,230 @@
-# 真实 PinMap：湖师·N20 循迹小车 / 智能小车扩展板
+# PinMap：地猛星 MSPM0G3507 + TB6612 循迹小车
 
-> 依据：用户上传的 `原理图.pdf` 与 `焊接图.pdf`。  
-> 适用：MSPM0G3507 扩展板接口、板载 RZ7899 四路电机驱动、蓝牙、超声波、2.4G、摄像头、顶部扩展口。  
-> 注意：本表是从原理图网络名整理出来的真实网络映射；实际写代码前仍要用万用表/串口测试确认高低电平方向。
-
----
-
-## 1. MSPM0 扩展板 P1：2.54-2×20
-
-P1 是左侧 2×20 排针。表中 `NC/保留` 表示原理图未标出功能网络，暂不建议占用。
-
-| P1 引脚 | 网络名 | 建议用途 |
-|---:|---|---|
-| 1 | `PC9` | 摄像头/视觉扩展 H3-2；也在顶部/扩展网络中出现 |
-| 2 | `PC8` | 摄像头/视觉扩展 H3-1 |
-| 3 | `TXD` | 板级 UART TXD 顶部扩展口 H2 |
-| 4 | `PA8` | 摄像头/视觉扩展 H3-4 |
-| 5 | NC/保留 | 暂不使用 |
-| 6 | `RXD` | 板级 UART RXD 顶部扩展口 H2 |
-| 7 | `LED_L` | 左车灯/左指示灯 |
-| 8 | NC/保留 | 暂不使用 |
-| 9 | NC/保留 | 暂不使用 |
-| 10 | NC/保留 | 暂不使用 |
-| 11 | `PC11` | 摄像头/视觉扩展 H3-3 |
-| 12 | NC/保留 | 暂不使用 |
-| 13 | NC/保留 | 暂不使用 |
-| 14 | NC/保留 | 暂不使用 |
-| 15 | `IRQ` | 2.4G/nRF24L01 IRQ |
-| 16 | `PD3` | 摄像头/视觉扩展 H3-6 |
-| 17 | `CSN` | 2.4G/nRF24L01 CSN |
-| 18 | `PG9` | 摄像头/视觉扩展 H3-5 |
-| 19 | `MISO` | SPI MISO，2.4G/nRF24L01 |
-| 20 | `SCK` | SPI SCK，2.4G/nRF24L01 |
-| 21 | `CE` | 2.4G/nRF24L01 CE |
-| 22 | `MOSI` | SPI MOSI，2.4G/nRF24L01 |
-| 23 | `LQ+` | 左前/左 Q 电机驱动输入 + |
-| 24 | `LED_M` | 模式/中间指示灯 |
-| 25 | `PB6` | 摄像头/视觉扩展 H3-8 |
-| 26 | `KEY_M` | MODE 按键输入 |
-| 27 | NC/保留 | 暂不使用 |
-| 28 | `PB7` | 摄像头/视觉扩展 H3-7 |
-| 29 | `PB9` | 摄像头/视觉扩展 H3-10 |
-| 30 | `PB8` | 摄像头/视觉扩展 H3-9 |
-| 31 | NC/保留 | 暂不使用 |
-| 32 | `LED_S` | START/状态指示灯，按软件定义 |
-| 33 | NC/保留 | 暂不使用 |
-| 34 | `KEY_S` | START 按键输入 |
-| 35 | NC/保留 | 暂不使用 |
-| 36 | NC/保留 | 暂不使用 |
-| 37 | `GND` | 地 |
-| 38 | `3V3` | 3.3V 电源 |
-| 39 | `GND` | 地 |
-| 40 | `5V` | 5V 电源 |
+> 来源：`参考文件-已实现案例/2026_04_地猛星电赛控制题配套资料/【小车】03_PID_car_灰度模块小车巡线/11_PID_car/Debug/ti_msp_dl_config.h`
+>
+> 本表为 SysConfig 生成的真实网络映射，已在实际工程中验证。写代码前用万用表确认高低电平方向。
 
 ---
 
-## 2. MSPM0 扩展板 P2：2.54-2×20
+## 1. TB6612 电机驱动
 
-| P2 引脚 | 网络名 | 建议用途 |
-|---:|---|---|
-| 1 | `XJ03` | 顶部扩展 IO XJ03 |
-| 2 | `XJ01` | 顶部扩展 IO XJ01 |
-| 3 | `XJ04` | 顶部扩展 IO XJ04 |
-| 4 | `XJ02` | 顶部扩展 IO XJ02 |
-| 5 | `PC7` | 摄像头/视觉扩展 H3-13 |
-| 6 | `PC6` | 摄像头/视觉扩展 H3-12 |
-| 7 | `XJ06` | 顶部扩展 IO XJ06 |
-| 8 | `XJ05` | 顶部扩展 IO XJ05 |
-| 9 | `XJ08` | 顶部扩展 IO XJ08 |
-| 10 | `XJ07` | 顶部扩展 IO XJ07 |
-| 11 | `LED_R` | 右车灯/右指示灯 |
-| 12 | `TRIQ` | 超声波 Trigger，原图写作 TRIQ |
-| 13 | NC/保留 | 暂不使用 |
-| 14 | `ECHO` | 超声波 Echo |
-| 15 | NC/保留 | 暂不使用 |
-| 16 | `LH-` | 左后/左 H 电机驱动输入 - |
-| 17 | `LH+` | 左后/左 H 电机驱动输入 + |
-| 18 | `ADC` | 电池电压分压采样输入，电池电压≈ADC×3 |
-| 19 | NC/保留 | 暂不使用 |
-| 20 | `LQ-` | 左前/左 Q 电机驱动输入 - |
-| 21 | `PA6` | 摄像头/视觉扩展 H3-10? 见 H3 表；也可作通用 IO |
-| 22 | NC/保留 | 暂不使用 |
-| 23 | `PA4` | 摄像头/视觉扩展 H3-11? 见 H3 表；也可作通用 IO |
-| 24 | `RQ+` | 右前/右 Q 电机驱动输入 + |
-| 25 | `EN` | 蓝牙 KEY/EN |
-| 26 | NC/保留 | 暂不使用 |
-| 27 | NC/保留 | 暂不使用 |
-| 28 | `RQ-` | 右前/右 Q 电机驱动输入 - |
-| 29 | `RH-` | 右后/右 H 电机驱动输入 - |
-| 30 | `RH+` | 右后/右 H 电机驱动输入 + |
-| 31 | NC/保留 | 暂不使用 |
-| 32 | `BUZZER` | 蜂鸣器驱动 |
-| 33 | NC/保留 | 暂不使用 |
-| 34 | `MCU_RXD` | 蓝牙模块 TXD → MCU_RXD |
-| 35 | `MCU_TXD` | MCU_TXD → 蓝牙模块 RXD |
-| 36 | `STATE` | 蓝牙模块 STATE 状态脚 |
-| 37 | `GND` | 地 |
-| 38 | `3V3` | 3.3V 电源 |
-| 39 | `GND` | 地 |
-| 40 | `5V` | 5V 电源 |
+### 1.1 左电机
+
+| 功能 | MSPM0 引脚 | IOMUX | TB6612 引脚 |
+|------|-----------|-------|------------|
+| PWM | **PA12** | PINCM34, TIMG0 CCP0 | PWMA |
+| 方向1 | **PA9** | PINCM20 | AIN1 |
+| 方向2 | **PA8** | PINCM19 | AIN2 |
+
+### 1.2 右电机
+
+| 功能 | MSPM0 引脚 | IOMUX | TB6612 引脚 |
+|------|-----------|-------|------------|
+| PWM | **PA13** | PINCM35, TIMG0 CCP1 | PWMB |
+| 方向1 | **PA7** | PINCM14 | BIN1 |
+| 方向2 | **PB18** | PINCM44 | BIN2 |
+
+### 1.3 公共控制
+
+| 功能 | MSPM0 引脚 | IOMUX | TB6612 引脚 |
+|------|-----------|-------|------------|
+| 待机/使能 | **PB24** | PINCM52 | STBY |
+
+### 1.4 TB6612 方向控制逻辑
+
+| 动作 | AIN1/BIN1 | AIN2/BIN2 | 说明 |
+|------|-----------|-----------|------|
+| 停止 | 0 | 0 | 滑行 |
+| 正转 | 1 | 0 | PWM 在 PWMA/PWMB |
+| 反转 | 0 | 1 | PWM 在 PWMA/PWMB |
+| 刹车 | 1 | 1 | 不建议默认使用 |
 
 ---
 
-## 3. 顶部扩展口 H2：20Pin
+## 2. 编码器（AB 相霍尔编码器）
 
-焊接图顶部丝印从左到右标出：
+### 2.1 左电机编码器
 
-```text
-3V3 GND SCL SDA RXD TXD GND 3V3 SWD SWC GND 5V XJ08 XJ07 XJ06 XJ05 XJ04 XJ03 XJ02 XJ01
-```
+| 功能 | MSPM0 引脚 | IOMUX | 说明 |
+|------|-----------|-------|------|
+| A 相 | **PA21** | PINCM46 | GPIO 中断计数 |
+| B 相 | **PA22** | PINCM47 | GPIO 中断计数 |
 
-按原理图 H2 编号，推荐理解为：
+### 2.2 右电机编码器
 
-| H2 引脚 | 网络名 | 用途 |
-|---:|---|---|
-| 1 | `XJ01` | 通用扩展 IO |
-| 2 | `XJ02` | 通用扩展 IO |
-| 3 | `XJ03` | 通用扩展 IO |
-| 4 | `XJ04` | 通用扩展 IO |
-| 5 | `XJ05` | 通用扩展 IO |
-| 6 | `XJ06` | 通用扩展 IO |
-| 7 | `XJ07` | 通用扩展 IO |
-| 8 | `XJ08` | 通用扩展 IO |
-| 9 | `5V` | 5V 电源 |
-| 10 | `GND` | 地 |
-| 11 | `SWC` | 调试时钟/保留 |
-| 12 | `SWD` | 调试数据/保留 |
-| 13 | `3V3` | 3.3V 电源 |
-| 14 | `GND` | 地 |
-| 15 | `TXD` | 板级 UART TXD |
-| 16 | `RXD` | 板级 UART RXD |
-| 17 | `SDA` | I2C SDA |
-| 18 | `SCL` | I2C SCL |
-| 19 | `GND` | 地 |
-| 20 | `3V3` | 3.3V 电源 |
+| 功能 | MSPM0 引脚 | IOMUX | 说明 |
+|------|-----------|-------|------|
+| A 相 | **PB19** | PINCM45 | GPIO 中断计数 |
+| B 相 | **PB20** | PINCM48 | GPIO 中断计数 |
 
-> 实物接线时更推荐看焊接图丝印，从左到右接，不要只看原理图编号。
-
----
-
-## 4. 蓝牙模块 U5
-
-| U5 引脚 | 网络名 | 连接说明 |
-|---:|---|---|
-| 1 | `EN` / `KEY` | 蓝牙配置/使能脚 |
-| 2 | `VCC` | 蓝牙供电，按模块要求接 5V 或 3.3V，图纸未把该脚直接标成 5V/3V3，需要实测/确认模块 |
-| 3 | `GND` | 地 |
-| 4 | `MCU_RXD` | 蓝牙 TXD → MCU RX |
-| 5 | `MCU_TXD` | MCU TX → 蓝牙 RXD |
-| 6 | `STATE` | 蓝牙连接状态 |
-
-串口方向：
-
-```text
-蓝牙 TXD → MCU_RXD
-蓝牙 RXD ← MCU_TXD
-```
-
----
-
-## 5. 超声波模块 H1
-
-| H1 引脚 | 网络名 | 说明 |
-|---:|---|---|
-| 1 | `5V` | 超声波供电 |
-| 2 | `TRIQ` | Trigger，原图写作 TRIQ |
-| 3 | `ECHO` | Echo 回波输入 |
-| 4 | `GND` | 地 |
-
-重要：如果使用 HC-SR04 这类 5V Echo 模块，ECHO 可能输出 5V，不建议直接进 MSPM0 3.3V IO。建议加 10k/20k 分压或电平转换。
-
----
-
-## 6. 2.4G/nRF24L01 模块 H4
-
-| H4 引脚 | 网络名 | 说明 |
-|---:|---|---|
-| 1 | `3V3` | 3.3V 供电，不能接 5V |
-| 2 | `GND` | 地 |
-| 3 | `CSN` | SPI 片选 |
-| 4 | `CE` | nRF24 CE |
-| 5 | `MOSI` | SPI MOSI |
-| 6 | `SCK` | SPI SCK |
-| 7 | `IRQ` | 中断 |
-| 8 | `MISO` | SPI MISO |
-
----
-
-## 7. 摄像头/视觉扩展口 H3：2×8
-
-| H3 引脚 | 网络名 | 说明 |
-|---:|---|---|
-| 1 | `PC8` | GPIO/视觉扩展 |
-| 2 | `PC9` | GPIO/视觉扩展 |
-| 3 | `PC11` | GPIO/视觉扩展 |
-| 4 | `PA8` | GPIO/视觉扩展 |
-| 5 | `PG9` | GPIO/视觉扩展 |
-| 6 | `PD3` | GPIO/视觉扩展 |
-| 7 | `PB7` | GPIO/视觉扩展 |
-| 8 | `PB6` | GPIO/视觉扩展 |
-| 9 | `PB8` | GPIO/视觉扩展 |
-| 10 | `PB9` | GPIO/视觉扩展 |
-| 11 | `PA4` | GPIO/视觉扩展 |
-| 12 | `PA6` | GPIO/视觉扩展 |
-| 13 | `PC7` | GPIO/视觉扩展 |
-| 14 | `PC6` | GPIO/视觉扩展 |
-| 15 | `5V` | 供电 |
-| 16 | `GND` | 地 |
-
----
-
-## 8. 板载四路 RZ7899 电机驱动
-
-| 电机 | 驱动芯片 | MCU 控制网络 | 输出/电机接口网络 | 建议第一版用途 |
-|---|---|---|---|---|
-| `LQ` | U4 | `LQ+`、`LQ-` | `FO79`、`BO79` | 左前轮/左轮 |
-| `LH` | U7 | `LH+`、`LH-` | `FO1012`、`BO1012` | 左后轮/备用左轮 |
-| `RQ` | U3 | `RQ+`、`RQ-` | `FO46`、`BO46` | 右前轮/右轮 |
-| `RH` | U2 | `RH+`、`RH-` | `FO13`、`BO13` | 右后轮/备用右轮 |
-
-### 8.1 RZ7899 双输入控制建议
-
-每一路有两个输入：`+` 和 `-`。建议控制逻辑：
-
-| 目标 | `+` 输入 | `-` 输入 | 说明 |
-|---|---|---|---|
-| 停止/滑行 | 0 | 0 | 电机停止，具体制动/滑行效果以 RZ7899 实测为准 |
-| 正转 | PWM | 0 | 第一版推荐 |
-| 反转 | 0 | PWM | 第一版推荐 |
-| 刹车/禁用 | 1 | 1 | 是否允许取决于芯片特性，先不要用作默认 |
-
-不要同时给 `+` 和 `-` 高频 PWM，先用“一脚 PWM、一脚低电平”的安全控制法。
-
----
-
-## 9. 建议软件命名
-
-为了代码不混乱，建议统一命名：
+### 2.3 编码器参数
 
 ```c
-// motor logical index
-typedef enum {
-    MOTOR_LQ = 0,
-    MOTOR_LH,
-    MOTOR_RQ,
-    MOTOR_RH,
-} motor_id_t;
-
-// logical two-wheel mode
-#define LEFT_MOTOR_PRIMARY   MOTOR_LQ
-#define RIGHT_MOTOR_PRIMARY  MOTOR_RQ
+#define ENCODER_PPR         260    // 编码器线数（每圈脉冲数）
+#define WHEEL_DIAMETER_MM    67    // 轮胎直径 mm
+#define GEAR_RATIO           20    // 减速比 1:20
 ```
 
-如果机械上用后轮驱动，则改为：
+### 2.4 速度换算
 
+```
+pulses_per_period → pulses_per_second → wheel_rps → mm_per_second
+
+speed_mm_s = counter / ENCODER_PPR * PI * WHEEL_DIAMETER_MM * (1000 / CONTROL_PERIOD_MS)
+```
+
+使用原始参数：
 ```c
-#define LEFT_MOTOR_PRIMARY   MOTOR_LH
-#define RIGHT_MOTOR_PRIMARY  MOTOR_RH
+// 1kHz 控制周期下的速度计算
+speed_mm_s = counter / 260.0f * 3.14f * 67.0f * 20.0f;
+// 计算完后清零计数器
 ```
 
 ---
 
-## 10. 第一版推荐占用
+## 3. 灰度循迹传感器（5 路数字量）
 
-先只做两轮差速：
+| 传感器位置 | MSPM0 引脚 | IOMUX | 说明 |
+|-----------|-----------|-------|------|
+| L2（最左） | **PA17** | PINCM39 | GPIO 输入 |
+| L1 | **PB8** | PINCM25 | GPIO 输入 |
+| M（中间） | **PB9** | PINCM26 | GPIO 输入 |
+| R1 | **PA24** | PINCM54 | GPIO 输入 |
+| R2（最右） | **PA2** | PINCM7 | GPIO 输入 |
 
-| 功能 | 网络 |
-|---|---|
-| 左轮 PWM/方向 | `LQ+`、`LQ-` |
-| 右轮 PWM/方向 | `RQ+`、`RQ-` |
-| START 按键 | `KEY_S` |
-| MODE 按键 | `KEY_M` |
-| 蜂鸣器 | `BUZZER` |
-| 电池采样 | `ADC` |
-| OLED/I2C | H2: `SCL`、`SDA`、`3V3`/`5V`、`GND`，按 OLED 模块电压选择 |
-| 串口调试 | H2: `TXD`、`RXD`、`GND` 或 USB 串口 |
-| 循迹传感器 | H2 的 `XJ01`~`XJ08` 或板上循迹接口，按实际传感器接线确定 |
+供电：按模块规格接 3.3V 或 5V，GND 共地。
 
-后续再启用：
+### 3.1 读数方式
 
-- `LH+`/`LH-`、`RH+`/`RH-`：四轮扩展；
-- `TRIQ`/`ECHO`：超声波；
-- `MOSI/MISO/SCK/CSN/CE/IRQ`：2.4G；
-- H3：视觉/摄像头扩展。
+```c
+// 数字量读法：DL_GPIO_readPins(port, pin) 返回非零为检测到黑线
+uint8_t value = (DL_GPIO_readPins(port, pin) & pin) ? 1 : 0;
+```
+
+### 3.2 加权偏差算法（8路示例，5路需缩减权重）
+
+```
+S0 S1 S2 S3 S4 S5 S6 S7
+-7 -5 -3 -1 +1 +3 +5 +7
+
+line_error = sum(active_i * weight_i) / active_count
+```
+
+---
+
+## 4. PID 控制定时器
+
+| 定时器 | 时钟源 | 装载值 | 频率 | 用途 |
+|--------|--------|--------|------|------|
+| **TIMA0** | 40 MHz | 39999 | **1 kHz** | 速度计算 + PID 更新 |
+
+```c
+#define CONTROL_FREQ_HZ      1000
+#define CONTROL_PERIOD_MS    1
+#define TIMER_LOAD_VALUE     39999   // 40MHz / (39999+1) = 1kHz
+```
+
+中断服务函数：
+```c
+void MOTOR_PID_INST_IRQHandler(void)
+{
+    switch (DL_Timer_getPendingInterrupt(MOTOR_PID_INST))
+    {
+    case DL_TIMER_IIDX_LOAD:
+        calculate_speed(1);
+        calculate_speed(2);
+        DC_MOTOR_PID(1);
+        DC_MOTOR_PID(2);
+        break;
+    default:
+        break;
+    }
+}
+```
+
+---
+
+## 5. OLED 显示
+
+| OLED 引脚 | 连接 |
+|-----------|------|
+| VCC | 3.3V 或 5V（按模块规格） |
+| GND | GND |
+| SCL | 地猛星 I2C SCL 或顶部扩展口 |
+| SDA | 地猛星 I2C SDA 或顶部扩展口 |
+
+驱动：SSD1306 / SH1106，I2C 地址 0x3C 或 0x3D。
+
+---
+
+## 6. PWM 参数
+
+```c
+#define PWM_TIMER           TIMG0
+#define PWM_CLK_FREQ        40000000   // 40 MHz
+#define PWM_PERIOD          4000       // 40MHz/4000 = 10kHz PWM频率
+#define PWM_MAX_DUTY        4000       // 最大占空比
+```
+
+---
+
+## 7. C 语言宏定义汇总
+
+```c
+// === TB6612 电机驱动 ===
+// 左电机
+#define MOTOR_L_PWM_PORT    GPIOA
+#define MOTOR_L_PWM_PIN     DL_GPIO_PIN_12   // PA12, TIMG0 CCP0
+#define MOTOR_L_AIN1_PORT   GPIOA
+#define MOTOR_L_AIN1_PIN    DL_GPIO_PIN_9    // PA9
+#define MOTOR_L_AIN2_PORT   GPIOA
+#define MOTOR_L_AIN2_PIN    DL_GPIO_PIN_8    // PA8
+
+// 右电机
+#define MOTOR_R_PWM_PORT    GPIOA
+#define MOTOR_R_PWM_PIN     DL_GPIO_PIN_13   // PA13, TIMG0 CCP1
+#define MOTOR_R_BIN1_PORT   GPIOA
+#define MOTOR_R_BIN1_PIN    DL_GPIO_PIN_7    // PA7
+#define MOTOR_R_BIN2_PORT   GPIOB
+#define MOTOR_R_BIN2_PIN    DL_GPIO_PIN_18   // PB18
+
+// 公共
+#define MOTOR_STBY_PORT     GPIOB
+#define MOTOR_STBY_PIN      DL_GPIO_PIN_24   // PB24
+
+// === 编码器 ===
+// 左电机
+#define ENC_L_A_PORT        GPIOA
+#define ENC_L_A_PIN         DL_GPIO_PIN_21   // PA21
+#define ENC_L_B_PORT        GPIOA
+#define ENC_L_B_PIN         DL_GPIO_PIN_22   // PA22
+
+// 右电机
+#define ENC_R_A_PORT        GPIOB
+#define ENC_R_A_PIN         DL_GPIO_PIN_19   // PB19
+#define ENC_R_B_PORT        GPIOB
+#define ENC_R_B_PIN         DL_GPIO_PIN_20   // PB20
+
+// === 灰度传感器 ===
+#define LINE_L2_PORT        GPIOA
+#define LINE_L2_PIN         DL_GPIO_PIN_17   // PA17
+#define LINE_L1_PORT        GPIOB
+#define LINE_L1_PIN         DL_GPIO_PIN_8    // PB8
+#define LINE_M_PORT         GPIOB
+#define LINE_M_PIN          DL_GPIO_PIN_9    // PB9
+#define LINE_R1_PORT        GPIOA
+#define LINE_R1_PIN         DL_GPIO_PIN_24   // PA24
+#define LINE_R2_PORT        GPIOA
+#define LINE_R2_PIN         DL_GPIO_PIN_2    // PA2
+
+// === 编码器参数 ===
+#define ENCODER_PPR         260
+#define WHEEL_DIAMETER_MM   67
+#define GEAR_RATIO          20
+#define PI                  3.14f
+
+// === 控制参数 ===
+#define CONTROL_FREQ_HZ     1000
+#define PWM_PERIOD          4000
+#define PWM_MAX_DUTY        4000
+```

@@ -3,470 +3,317 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>MSPM0G3507 循迹小车训练平台计划</title>
+  <title>MSPM0G3507 循迹小车 + 云台训练平台</title>
   <style>
     :root {
-      --bg: #f6f7f4;
-      --card: #ffffff;
-      --text: #172019;
-      --muted: #5f6b61;
-      --line: #e2e6df;
-      --accent: #256d4a;
-      --accent-2: #e9f4ed;
-      --warn: #9a5a00;
-      --warn-bg: #fff7e8;
-      --shadow: 0 18px 45px rgba(20, 40, 25, 0.08);
-      --radius: 22px;
+      --bg: #f8f9f7; --card: #ffffff; --text: #1a1d1b; --muted: #5f6b61;
+      --line: #e4e8e2; --accent: #1b6b3f; --accent-soft: #e8f5ec;
+      --amber: #b85c00; --amber-soft: #fff7ed; --blue: #1a5faa; --blue-soft: #edf5ff;
+      --purple: #6b21a8; --purple-soft: #f8f0ff; --rose: #b91c4b; --rose-soft: #fff0f3;
+      --radius: 20px; --radius-sm: 12px;
     }
-
-    * { box-sizing: border-box; }
-
+    * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
-      margin: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", Arial, sans-serif;
-      color: var(--text);
-      background:
-        radial-gradient(circle at 15% 0%, rgba(37, 109, 74, 0.12), transparent 34%),
-        radial-gradient(circle at 85% 8%, rgba(154, 90, 0, 0.10), transparent 30%),
-        var(--bg);
-      line-height: 1.75;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+      color: var(--text); background: var(--bg); line-height: 1.7;
     }
+    .wrap { max-width: 1200px; margin: 0 auto; padding: 40px 24px 80px; }
 
-    .page {
-      max-width: 1180px;
-      margin: 0 auto;
-      padding: 48px 20px 80px;
-    }
-
+    /* Hero */
     .hero {
-      padding: 56px;
-      border-radius: 32px;
-      background: linear-gradient(135deg, rgba(255,255,255,0.95), rgba(239,247,241,0.95));
-      box-shadow: var(--shadow);
-      border: 1px solid rgba(255,255,255,0.8);
+      padding: 56px 48px; border-radius: 28px;
+      background: linear-gradient(145deg, #fff 0%, #f0f7f2 40%, #eaf2ed 100%);
+      border: 1px solid rgba(27,107,63,0.12); margin-bottom: 32px;
+    }
+    .chip {
+      display: inline-flex; align-items: center; gap: 6px; padding: 5px 14px;
+      border-radius: 99px; background: var(--accent-soft); color: var(--accent);
+      font-weight: 700; font-size: 13px; letter-spacing: 0.02em; margin-bottom: 20px;
+    }
+    .hero h1 { font-size: clamp(30px, 4.5vw, 50px); line-height: 1.1; letter-spacing: -0.03em; margin-bottom: 14px; }
+    .hero .sub { font-size: 18px; color: var(--muted); max-width: 800px; }
+    .hero-stats { display: grid; grid-template-columns: repeat(4,1fr); gap: 14px; margin-top: 32px; }
+    .stat { background: #fff; border: 1px solid var(--line); border-radius: var(--radius-sm); padding: 18px; text-align: center; }
+    .stat .num { font-size: 32px; font-weight: 800; color: var(--accent); line-height: 1.1; }
+    .stat .lbl { font-size: 13px; color: var(--muted); margin-top: 4px; }
+
+    /* Sections */
+    section { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 36px; margin-bottom: 20px; }
+    h2 { font-size: 26px; letter-spacing: -0.02em; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
+    h2 .icon { width: 36px; height: 36px; border-radius: 10px; display: grid; place-items: center; font-size: 18px; }
+    h3 { font-size: 18px; margin: 20px 0 8px; }
+
+    /* Flow */
+    .flow { display: grid; grid-template-columns: repeat(6,1fr); gap: 10px; margin-top: 16px; }
+    .flow .step {
+      padding: 16px 12px; background: var(--accent-soft); border: 1px solid rgba(27,107,63,0.15);
+      border-radius: var(--radius-sm); text-align: center; font-weight: 700; font-size: 14px;
+      display: flex; align-items: center; justify-content: center; min-height: 70px;
     }
 
-    .eyebrow {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 6px 12px;
-      border-radius: 999px;
-      background: var(--accent-2);
-      color: var(--accent);
-      font-weight: 700;
-      font-size: 14px;
-      margin-bottom: 18px;
-    }
-
-    h1 {
-      font-size: clamp(34px, 5vw, 58px);
-      line-height: 1.12;
-      margin: 0 0 18px;
-      letter-spacing: -0.04em;
-    }
-
-    .subtitle {
-      max-width: 880px;
-      font-size: 20px;
-      color: var(--muted);
-      margin: 0;
-    }
-
-    .hero-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 16px;
-      margin-top: 36px;
-    }
-
-    .metric {
-      padding: 20px;
-      border-radius: 18px;
-      background: #fff;
-      border: 1px solid var(--line);
-    }
-
-    .metric strong {
-      display: block;
-      font-size: 28px;
-      color: var(--accent);
-      line-height: 1.2;
-    }
-
-    .metric span {
-      color: var(--muted);
-      font-size: 14px;
-    }
-
-    section {
-      margin-top: 28px;
-      padding: 34px;
-      border-radius: var(--radius);
-      background: var(--card);
-      border: 1px solid var(--line);
-      box-shadow: 0 10px 25px rgba(20, 40, 25, 0.04);
-    }
-
-    h2 {
-      margin: 0 0 18px;
-      font-size: 28px;
-      letter-spacing: -0.02em;
-    }
-
-    h3 {
-      margin: 24px 0 10px;
-      font-size: 20px;
-    }
-
-    p { margin: 0 0 12px; }
-
-    .conclusion {
-      border-left: 6px solid var(--accent);
-      background: var(--accent-2);
-      padding: 20px 22px;
-      border-radius: 16px;
-      font-size: 18px;
-      font-weight: 700;
-    }
-
-    .warning {
-      border-left: 6px solid var(--warn);
-      background: var(--warn-bg);
-      padding: 18px 20px;
-      border-radius: 16px;
-      color: #563400;
-    }
-
-    .flow {
-      display: grid;
-      grid-template-columns: repeat(6, 1fr);
-      gap: 12px;
-      margin-top: 18px;
-    }
-
-    .step {
-      padding: 16px 14px;
-      background: #f9faf7;
-      border: 1px solid var(--line);
-      border-radius: 16px;
-      text-align: center;
-      font-weight: 700;
-      min-height: 86px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .cards {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 16px;
-      margin-top: 16px;
-    }
-
+    /* Cards grid */
+    .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .grid3 { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; }
     .card {
-      padding: 22px;
-      border: 1px solid var(--line);
-      border-radius: 18px;
-      background: #fbfcfa;
+      padding: 24px; border: 1px solid var(--line); border-radius: var(--radius-sm);
+      background: #fafbfa; transition: box-shadow 0.2s;
     }
+    .card:hover { box-shadow: 0 6px 20px rgba(0,0,0,0.06); }
+    .card h3 { margin-top: 0; font-size: 17px; }
 
-    .card h3 { margin-top: 0; }
+    /* Tables */
+    table { width: 100%; border-collapse: collapse; border-radius: var(--radius-sm); overflow: hidden; font-size: 14px; }
+    th, td { border: 1px solid var(--line); padding: 10px 13px; text-align: left; }
+    th { background: #f3f6f2; font-weight: 700; }
 
-    ul, ol { padding-left: 1.35em; }
-
-    li { margin: 6px 0; }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 12px;
-      overflow: hidden;
-      border-radius: 16px;
-      font-size: 15px;
+    /* Timeline */
+    .timeline { display: grid; gap: 12px; }
+    .tl-item {
+      display: grid; grid-template-columns: 52px 1fr; gap: 14px; align-items: start;
+      padding: 18px; border: 1px solid var(--line); border-radius: var(--radius-sm); background: #fbfcfa;
     }
-
-    th, td {
-      border: 1px solid var(--line);
-      padding: 12px 14px;
-      text-align: left;
-      vertical-align: top;
+    .tl-num {
+      width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center;
+      font-weight: 800; font-size: 16px; color: #fff;
     }
+    .tl-item:nth-child(1) .tl-num { background: var(--accent); }
+    .tl-item:nth-child(2) .tl-num { background: var(--blue); }
+    .tl-item:nth-child(3) .tl-num { background: var(--purple); }
+    .tl-item:nth-child(4) .tl-num { background: var(--amber); }
+    .tl-item:nth-child(5) .tl-num { background: var(--rose); }
+    .tl-body strong { font-size: 16px; }
 
-    th {
-      background: #f0f5ef;
-      color: #234432;
-    }
+    /* Platform diagram */
+    .arch { display: grid; grid-template-columns: 1fr 80px 1fr; gap: 0; align-items: center; margin-top: 16px; }
+    .arch-col { display: flex; flex-direction: column; gap: 10px; }
+    .arch-node { padding: 14px 16px; border-radius: var(--radius-sm); font-weight: 600; font-size: 14px; text-align: center; }
+    .arch-node.mcu { background: var(--accent); color: #fff; font-size: 16px; padding: 20px; }
+    .arch-node.motor { background: var(--amber-soft); border: 1px solid rgba(184,92,0,0.2); color: var(--amber); }
+    .arch-node.sensor { background: var(--blue-soft); border: 1px solid rgba(26,95,170,0.2); color: var(--blue); }
+    .arch-node.vision { background: var(--purple-soft); border: 1px solid rgba(107,33,168,0.2); color: var(--purple); }
+    .arch-node.gimbal { background: var(--rose-soft); border: 1px solid rgba(185,28,75,0.2); color: var(--rose); }
+    .arch-arrow { text-align: center; font-size: 24px; color: var(--muted); }
 
-    code {
-      background: #eef2ed;
-      padding: 2px 6px;
-      border-radius: 6px;
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
-    }
+    /* Pin table compact */
+    .pin-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 14px; }
+    .pin-card { border: 1px solid var(--line); border-radius: var(--radius-sm); padding: 16px; background: #fafbfa; }
+    .pin-card h4 { font-size: 14px; color: var(--accent); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.05em; }
+    .pin-card table { font-size: 13px; }
+    .pin-card th { background: #f0f3ef; }
 
-    .timeline {
-      display: grid;
-      gap: 12px;
-      counter-reset: item;
-    }
+    .footer { text-align: center; color: var(--muted); font-size: 13px; margin-top: 24px; }
 
-    .timeline-item {
-      position: relative;
-      padding: 18px 18px 18px 58px;
-      border: 1px solid var(--line);
-      border-radius: 18px;
-      background: #fbfcfa;
-    }
-
-    .timeline-item::before {
-      counter-increment: item;
-      content: counter(item);
-      position: absolute;
-      left: 18px;
-      top: 20px;
-      width: 26px;
-      height: 26px;
-      border-radius: 50%;
-      background: var(--accent);
-      color: #fff;
-      display: grid;
-      place-items: center;
-      font-weight: 800;
-      font-size: 14px;
-    }
-
-    .footer {
-      margin-top: 26px;
-      color: var(--muted);
-      text-align: center;
-      font-size: 14px;
-    }
-
-    @media (max-width: 900px) {
-      .hero { padding: 34px; }
-      .hero-grid, .cards { grid-template-columns: 1fr; }
-      .flow { grid-template-columns: repeat(2, 1fr); }
+    @media (max-width: 860px) {
+      .hero { padding: 32px 24px; }
+      .hero-stats { grid-template-columns: 1fr 1fr; }
+      .flow { grid-template-columns: repeat(2,1fr); }
+      .grid2, .grid3 { grid-template-columns: 1fr; }
+      .arch { grid-template-columns: 1fr; }
+      .arch-arrow { transform: rotate(90deg); }
+      .pin-grid { grid-template-columns: 1fr; }
       section { padding: 24px; }
     }
   </style>
 </head>
 <body>
-  <main class="page">
-    <header class="hero">
-      <div class="eyebrow">电赛备赛 · MSPM0G3507 · 控制小车</div>
-      <h1>循迹小车不是终点，而是电赛控制能力的积木底座</h1>
-      <p class="subtitle">
-        本计划围绕 TI MSPM0G3507、老师提供的循迹小车 PCB、编码器电机、TB6612、电源、循迹传感器、PID、串口/OLED 调参，搭建一个可复用、可迭代、可迁移到正式电赛题目的训练平台。
-      </p>
+<div class="wrap">
 
-      <div class="hero-grid">
-        <div class="metric">
-          <strong>1</strong>
-          <span>一个主平台：MSPM0G3507</span>
-        </div>
-        <div class="metric">
-          <strong>3</strong>
-          <span>三批采购：基础、稳定、冲高分</span>
-        </div>
-        <div class="metric">
-          <strong>6+</strong>
-          <span>沉淀电源、电机、循迹、PID、通信、显示模块</span>
-        </div>
-      </div>
-    </header>
-
-    <section>
-      <h2>一句话结论</h2>
-      <div class="conclusion">
-        现在最应该买的不是一堆开发板，而是能把 MSPM0G3507 小车底层闭环跑稳的器材：天猛星 MSPM0G3507、小车 PCB、N20 编码器电机、TB6612、8 路灰度循迹、电源系统、USB 串口、OLED 和基础调试工具。
-      </div>
-    </section>
-
-    <section>
-      <h2>训练主线</h2>
-      <p>先把“能跑、能测、能调、能复现”做出来，再考虑视觉、云台、复杂通信。</p>
-      <div class="flow">
-        <div class="step">点灯/串口/OLED</div>
-        <div class="step">PWM 电机控制</div>
-        <div class="step">编码器测速</div>
-        <div class="step">灰度循迹</div>
-        <div class="step">速度 PID</div>
-        <div class="step">转向 PID</div>
-      </div>
-    </section>
-
-    <section>
-      <h2>分三批采购</h2>
-      <div class="cards">
-        <div class="card">
-          <h3>第一批：能跑起来</h3>
-          <ul>
-            <li>天猛星 MSPM0G3507</li>
-            <li>老师循迹小车 PCB</li>
-            <li>N20 带编码器电机 ×2</li>
-            <li>TB6612FNG ×2</li>
-            <li>8 路灰度循迹模块</li>
-            <li>18650 电池、降压模块、开关、电容</li>
-            <li>USB 转串口、OLED、杜邦线</li>
-          </ul>
-        </div>
-        <div class="card">
-          <h3>第二批：能稳定调参</h3>
-          <ul>
-            <li>USB 逻辑分析仪</li>
-            <li>万用表和基础焊接工具</li>
-            <li>备用电机、备用 TB6612</li>
-            <li>蓝牙串口模块</li>
-            <li>IMU、超声波模块</li>
-            <li>白色场地布、黑色胶带</li>
-          </ul>
-        </div>
-        <div class="card">
-          <h3>第三批：冲高分扩展</h3>
-          <ul>
-            <li>二自由度云台</li>
-            <li>MG90S 舵机</li>
-            <li>PCA9685 舵机驱动</li>
-            <li>OpenMV 视觉模块</li>
-            <li>靶面材料和固定支架</li>
-            <li>经老师确认的安全光源方案</li>
-          </ul>
-        </div>
-      </div>
-    </section>
-
-    <section>
-      <h2>第一单建议</h2>
-      <table>
-        <thead>
-          <tr>
-            <th>类别</th>
-            <th>建议购买</th>
-            <th>原因</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>主控</td>
-            <td>天猛星 MSPM0G3507 ×1；LP-MSPM0G3507 ×1 可选</td>
-            <td>统一 TI 平台，提前适应 SDK、SysConfig、官方生态</td>
-          </tr>
-          <tr>
-            <td>底盘</td>
-            <td>小车 PCB ×2；N20 编码器电机 ×2；车轮 ×2；万向轮 ×1</td>
-            <td>两轮差速结构简单，最适合先练循迹和 PID</td>
-          </tr>
-          <tr>
-            <td>驱动</td>
-            <td>TB6612FNG ×2</td>
-            <td>效率和体积更适合小车，准备一个备用</td>
-          </tr>
-          <tr>
-            <td>传感</td>
-            <td>8 路灰度循迹模块 ×1</td>
-            <td>可计算偏差，适合转向 PID</td>
-          </tr>
-          <tr>
-            <td>电源</td>
-            <td>18650、电池盒、5V 3A 降压、开关、指示灯、电解电容</td>
-            <td>电机干扰和供电不稳是小车最常见问题</td>
-          </tr>
-          <tr>
-            <td>调试</td>
-            <td>USB 转串口、OLED、万用表、USB 逻辑分析仪</td>
-            <td>能看到数据，才能快速定位问题和调 PID</td>
-          </tr>
-        </tbody>
-      </table>
-    </section>
-
-    <section>
-      <h2>五周推进路线</h2>
-      <div class="timeline">
-        <div class="timeline-item">
-          <strong>第 1 周：MSPM0G3507 基础外设</strong><br />
-          点灯、按键、串口、PWM、ADC、OLED、定时器。目标是开发环境彻底打通。
-        </div>
-        <div class="timeline-item">
-          <strong>第 2 周：小车基础运动</strong><br />
-          电机正反转、左右轮 PWM 调速、循迹模块读取、基础循迹跑圈。
-        </div>
-        <div class="timeline-item">
-          <strong>第 3 周：闭环控制</strong><br />
-          编码器测速、速度 PID、转向 PID、串口调参、OLED 显示参数。
-        </div>
-        <div class="timeline-item">
-          <strong>第 4 周：工程化改进</strong><br />
-          电源抗干扰、线束整理、模块固定、接线图、故障排查表、测试数据记录。
-        </div>
-        <div class="timeline-item">
-          <strong>第 5 周以后：冲高分模块</strong><br />
-          视觉、云台、IMU、蓝牙调参、路径规划、数据记录和报告模板。
-        </div>
-      </div>
-    </section>
-
-    <section>
-      <h2>暂时不要优先做</h2>
-      <table>
-        <thead>
-          <tr>
-            <th>不优先</th>
-            <th>原因</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>直接上树莓派/K230</td>
-            <td>系统复杂度太高，小车底层不稳时会拖慢整体进度</td>
-          </tr>
-          <tr>
-            <td>四驱/麦克纳姆轮</td>
-            <td>控制模型复杂，不适合第一版练 PID 循迹</td>
-          </tr>
-          <tr>
-            <td>L298N 作为主驱动</td>
-            <td>发热大、效率低，推荐 TB6612FNG</td>
-          </tr>
-          <tr>
-            <td>无编码器电机</td>
-            <td>难以训练速度闭环，后期 PID 价值低</td>
-          </tr>
-          <tr>
-            <td>大量不同开发板</td>
-            <td>会分散精力，先玩透 MSPM0G3507</td>
-          </tr>
-        </tbody>
-      </table>
-    </section>
-
-    <section>
-      <h2>安全和避坑</h2>
-      <div class="warning">
-        MSPM0G3507 不要使用 ST-LINK 下载；ST-LINK 留给 STM32。电机、舵机不要直接从开发板取大电流。所有模块必须共地。光源/激光相关实验必须经过老师或实验室安全确认，早期用普通 LED 或低风险指示光源替代即可。
-      </div>
-    </section>
-
-    <section>
-      <h2>最后的判断标准</h2>
-      <p>这个项目做得好不好，不看有没有炫酷外设，而看下面这些是否稳定：</p>
-      <ol>
-        <li>MSPM0G3507 工程能稳定下载和调试；</li>
-        <li>电机一转开发板不复位；</li>
-        <li>编码器速度数据稳定可信；</li>
-        <li>灰度传感器能稳定识别黑线；</li>
-        <li>小车能低速循迹跑完整圈；</li>
-        <li>速度 PID 和转向 PID 可通过串口快速调参；</li>
-        <li>OLED 能显示模式、速度、偏差、电池电压和 PID 参数；</li>
-        <li>接线、参数、测试数据有文档可复现。</li>
-      </ol>
-    </section>
-
-    <div class="footer">
-      文件位置：<code>control-car/web/index.html</code>。详细执行方案见 <code>control-car/docs/AI-IMPLEMENTATION-PLAN.md</code>。
+  <!-- Hero -->
+  <header class="hero">
+    <div class="chip">&#9889; 电赛备赛 · 地猛星 MSPM0G3507</div>
+    <h1>循迹小车 + 二维云台<br>电赛控制能力的积木底座</h1>
+    <p class="sub">围绕 TI MSPM0G3507，基于已验证的参考案例，搭建 TB6612 电机驱动、编码器测速、灰度循迹、速度 PID、转向 PID、OpenMV 视觉、步进云台的完整训练平台。</p>
+    <div class="hero-stats">
+      <div class="stat"><div class="num">12</div><div class="lbl">小车参考 CCS 工程</div></div>
+      <div class="stat"><div class="num">6</div><div class="lbl">云台参考 CCS 工程</div></div>
+      <div class="stat"><div class="num">3</div><div class="lbl">视觉/AI 方案</div></div>
+      <div class="stat"><div class="num">4</div><div class="lbl">训练阶段</div></div>
     </div>
-  </main>
+  </header>
+
+  <!-- Platform Architecture -->
+  <section>
+    <h2><span class="icon" style="background:var(--accent-soft)">&#127959;</span> 平台架构</h2>
+    <div class="arch">
+      <div class="arch-col">
+        <div class="arch-node motor">&#9881; TB6612FNG 双路电机驱动<br><small>PA12 PWM · PA9/PA8 方向</small></div>
+        <div class="arch-node sensor">&#128196; 编码器测速<br><small>PA21/PA22 · PB19/PB20 · 260线</small></div>
+        <div class="arch-node sensor">&#128065; 5路灰度循迹<br><small>PA17 PB8 PB9 PA24 PA2</small></div>
+      </div>
+      <div class="arch-arrow">&#8594;</div>
+      <div class="arch-col">
+        <div class="arch-node mcu">地猛星<br>MSPM0G3507</div>
+        <div class="arch-node gimbal">&#127760; DCC-100v3 步进云台<br><small>PA12~PA16 · 0.05625°/脉冲</small></div>
+        <div class="arch-node vision">&#128247; OpenMV H7 Plus<br><small>色块 · AprilTag · UART 坐标</small></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4-Phase Roadmap -->
+  <section>
+    <h2><span class="icon" style="background:var(--blue-soft)">&#128640;</span> 训练路线</h2>
+    <div class="timeline">
+      <div class="tl-item">
+        <div class="tl-num">0</div>
+        <div class="tl-body">
+          <strong>阶段 0：环境搭建</strong>
+          <p style="color:var(--muted); margin-top:4px;">CCS Theia + XDS110 + LED → OLED → UART → 按键/ADC → 舵机。参考 <code>01_LED</code> ~ <code>09_PWM_SERVO</code> 入门教程。</p>
+        </div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-num">1</div>
+        <div class="tl-body">
+          <strong>阶段 1：小车最小闭环</strong>
+          <p style="color:var(--muted); margin-top:4px;">TB6612 双电机 PWM + 编码器测速 + 增量式 PI 速度闭环（kp=0.5/ki=0.4） + 5路灰度循迹。参考 <code>【小车】01</code> ~ <code>【小车】03</code>。</p>
+        </div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-num">2</div>
+        <div class="tl-body">
+          <strong>阶段 2：工程化</strong>
+          <p style="color:var(--muted); margin-top:4px;">状态机 + UART 命令行调参 + OLED 多页状态显示 + CSV 测试数据记录 + 故障排查文档。</p>
+        </div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-num">3</div>
+        <div class="tl-body">
+          <strong>阶段 3：视觉 + 云台扩展</strong>
+          <p style="color:var(--muted); margin-top:4px;">OpenMV 色块追踪 → UART 坐标 → MSPM0 控制 DCC-100v3 步进云台对准 + MPU6050 姿态检测。参考 <code>【云台】02</code> ~ <code>【云台】08</code>。</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Key Hardware Specs -->
+  <section>
+    <h2><span class="icon" style="background:var(--amber-soft)">&#9881;</span> 硬件关键参数</h2>
+    <div class="pin-grid">
+      <div class="pin-card">
+        <h4>&#128664; TB6612 电机驱动</h4>
+        <table>
+          <tr><th>功能</th><th>MSPM0 引脚</th></tr>
+          <tr><td>左 PWM</td><td><code>PA12</code> (TIMG0 CCP0)</td></tr>
+          <tr><td>左 AIN1/AIN2</td><td><code>PA9</code> / <code>PA8</code></td></tr>
+          <tr><td>右 PWM</td><td><code>PA13</code> (TIMG0 CCP1)</td></tr>
+          <tr><td>右 BIN1/BIN2</td><td><code>PA7</code> / <code>PB18</code></td></tr>
+          <tr><td>STBY</td><td><code>PB24</code></td></tr>
+        </table>
+      </div>
+      <div class="pin-card">
+        <h4>&#128196; 编码器 + 灰度</h4>
+        <table>
+          <tr><th>功能</th><th>MSPM0 引脚</th></tr>
+          <tr><td>左 A/B 相</td><td><code>PA21</code> / <code>PA22</code></td></tr>
+          <tr><td>右 A/B 相</td><td><code>PB19</code> / <code>PB20</code></td></tr>
+          <tr><td>灰度 L2~R2</td><td><code>PA17 PB8 PB9 PA24 PA2</code></td></tr>
+          <tr><td>编码器线数</td><td>260 PPR · 67mm 轮径</td></tr>
+        </table>
+      </div>
+      <div class="pin-card">
+        <h4>&#127760; DCC-100v3 云台</h4>
+        <table>
+          <tr><th>功能</th><th>MSPM0 引脚</th></tr>
+          <tr><td>PWM 脉冲</td><td><code>PA12</code></td></tr>
+          <tr><td>DIR / DCY / SLP / RST</td><td><code>PA13 / PA14 / PA15 / PA16</code></td></tr>
+          <tr><td>单脉冲角度</td><td>0.05625° (1.8°/32微步)</td></tr>
+          <tr><td>激光笔</td><td><code>PA17</code></td></tr>
+        </table>
+      </div>
+      <div class="pin-card">
+        <h4>&#128247; OpenMV H7 Plus</h4>
+        <table>
+          <tr><th>功能</th><th>说明</th></tr>
+          <tr><td>处理器</td><td>STM32H743 · 32MB RAM</td></tr>
+          <tr><td>摄像头</td><td>MT9M114</td></tr>
+          <tr><td>内置算法</td><td>色块 / AprilTag / 巡线 / 二维码</td></tr>
+          <tr><td>连接 MSPM0</td><td>UART 发送 (cx,cy) 坐标</td></tr>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- PID -->
+  <section>
+    <h2><span class="icon" style="background:var(--purple-soft)">&#128200;</span> PID 控制参数</h2>
+    <div class="grid2">
+      <div class="card">
+        <h3>增量式 PI（速度环）</h3>
+        <pre style="background:#f5f6f3;padding:14px;border-radius:8px;font-size:13px;overflow-x:auto;">
+duty += kp * (err - last_err) + ki * err
+
+kp = 0.5  ki = 0.4  控制周期: 1kHz (TIMA0)
+PWM 周期: 4000 (10kHz)  起步速度: 125 mm/s</pre>
+      </div>
+      <div class="card">
+        <h3>调参顺序</h3>
+        <ol style="font-size:14px;">
+          <li>不循迹，先调左右速度 P</li>
+          <li>加少量 I 减少稳态误差</li>
+          <li>低速开环循迹（125 mm/s）</li>
+          <li>调循迹 Kp 回到线上</li>
+          <li>加 Kd 减少左右摇摆</li>
+          <li>逐步提高基础速度</li>
+        </ol>
+      </div>
+    </div>
+  </section>
+
+  <!-- Reference Cases -->
+  <section>
+    <h2><span class="icon" style="background:var(--accent-soft)">&#128218;</span> 参考已实现案例</h2>
+    <div class="grid3">
+      <div class="card">
+        <h3>&#128664; 小车控制</h3>
+        <ul style="font-size:13px;color:var(--muted);padding-left:1.2em;">
+          <li><code>01_DC_MOTOR_PID_1</code> TB6612 旋转</li>
+          <li><code>02_DC_MOTOR_PID_2</code> 编码器测速</li>
+          <li><code>02_DC_MOTOR_PID_3</code> 速度 PID</li>
+          <li><strong><code>03_PID_car</code> 灰度循迹</strong></li>
+          <li><code>04_MPU6050</code> 姿态角度</li>
+          <li><code>06_imu601</code> 陀螺仪+OLED</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>&#127760; 云台控制</h3>
+        <ul style="font-size:13px;color:var(--muted);padding-left:1.2em;">
+          <li><code>02_step_motor</code> 开环旋转</li>
+          <li><code>03_step_motor</code> 角速度+角度</li>
+          <li><code>04_闭环步进</code> DCC-101v1</li>
+          <li><code>05_SPI屏幕</code> 中文显示</li>
+          <li><code>07_按键激光</code> 激光笔</li>
+          <li><strong><code>08_按键遥控</code> 双轴云台</strong></li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>&#128247; 视觉/AI</h3>
+        <ul style="font-size:13px;color:var(--muted);padding-left:1.2em;">
+          <li><code>yolo全系列</code> YOLO 训练 pipeline</li>
+          <li><code>k230 yolov12</code> 端侧推理</li>
+          <li><code>xbhdcc_tools</code> 双路 MJPEG 推流</li>
+          <li><strong>OpenMV H7 Plus</strong> 色块/AprilTag</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- Safety -->
+  <section style="border-left:5px solid var(--amber); background:var(--amber-soft);">
+    <h2>&#9888; 安全与避坑</h2>
+    <ul style="padding-left:1.2em;">
+      <li>MSPM0G3507 使用 <strong>XDS110</strong> 下载，不使用 ST-LINK</li>
+      <li>电机/舵机不要从开发板直接取大电流，TB6612 VM 直连电池</li>
+      <li>所有模块 <strong>GND 必须共地</strong>（电池→电源模块→TB6612→MSPM0）</li>
+      <li>TB6612 VM 附近并联 100~470μF 电解电容</li>
+      <li>激光实验必须经过老师或实验室安全确认，调试阶段用普通 LED 替代</li>
+      <li>小车底层不稳时不堆视觉/云台，先跑通阶段 1 再扩展</li>
+    </ul>
+  </section>
+
+  <div class="footer">
+    <p>文档：<code>control-car/</code> &nbsp;|&nbsp; 详细方案：<code>control-car/docs/AI-IMPLEMENTATION-PLAN.md</code> &nbsp;|&nbsp; 引脚：<code>control-car/hardware/pinmap.md</code></p>
+    <p style="margin-top:8px;">基于 <code>参考文件-已实现案例/2026_04_地猛星电赛控制题配套资料/</code> 已验证工程整理</p>
+  </div>
+
+</div>
 </body>
 </html>
